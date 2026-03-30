@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Peticiones Efectivas — Guía Práctica</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #0F1117;
+      --surface: #181B23;
+      --surface2:#1F2330;
+      --border:  #2A2F3E;
+      --accent:  #4F7CFF;
+      --violet:  #8B5CF6;
+      --violet2: #6D28D9;
+      --gold:    #F59E0B;
+      --red:     #EF4444;
+      --green:   #10B981;
+      --teal:    #14B8A6;
+      --text:    #E8ECF5;
+      --muted:   #8892AA;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    /* ── NAV ── */
+    .topnav {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(15,17,23,0.90); backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 32px; display: flex; align-items: center; gap: 12px;
+    }
+    .back-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 13px; font-weight: 500; color: var(--muted); text-decoration: none;
+      transition: color 0.15s;
+    }
+    .back-btn:hover { color: var(--text); }
+    .topnav-sep { color: var(--border); font-size: 18px; }
+    .topnav-title { font-size: 13px; font-weight: 600; color: var(--text); }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative; overflow: hidden;
+      padding: 80px 32px 64px; text-align: center;
+    }
+    .hero::before {
+      content: ''; position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 65% 55% at 50% 0%, rgba(139,92,246,0.11) 0%, transparent 65%),
+        radial-gradient(ellipse 40% 35% at 15% 90%, rgba(79,124,255,0.07) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 11px; font-weight: 600; letter-spacing: 2.5px;
+      text-transform: uppercase; color: var(--violet); margin-bottom: 18px;
+      border: 1px solid rgba(139,92,246,0.3); border-radius: 20px;
+      padding: 5px 14px; background: rgba(139,92,246,0.07);
+    }
+    .hero h1 { font-size: clamp(26px, 4.5vw, 46px); font-weight: 700; line-height: 1.15; margin-bottom: 12px; }
+    .hero h1 em {
+      font-style: normal;
+      background: linear-gradient(135deg, var(--violet), #A78BFA);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .hero-sub { font-size: 15px; color: var(--muted); max-width: 580px; margin: 0 auto; line-height: 1.7; }
+
+    /* ── CONTENT ── */
+    .content { max-width: 900px; margin: 0 auto; padding: 0 32px 100px; }
+
+    /* ── SECTION BLOCK ── */
+    .section-block { margin-bottom: 58px; }
+    .section-num { font-size: 11px; font-weight: 700; letter-spacing: 2px; color: var(--violet); text-transform: uppercase; margin-bottom: 8px; display: block; }
+    .section-title { font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 12px; line-height: 1.3; }
+    .section-lead { font-size: 14.5px; color: var(--muted); line-height: 1.8; max-width: 760px; }
+    .section-lead strong { color: var(--text); font-weight: 500; }
+
+    /* ── SPLIT CARD ── */
+    .split-card {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+      margin-top: 24px; border: 1px solid var(--border); border-radius: 14px; overflow: hidden;
+    }
+    @media (max-width: 580px) { .split-card { grid-template-columns: 1fr; } }
+    .split-side { padding: 26px; }
+    .split-side:first-child { border-right: 1px solid var(--border); background: rgba(139,92,246,0.04); }
+    .split-side:last-child { background: rgba(79,124,255,0.04); }
+    .split-tag { font-size: 10px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; border-radius: 5px; padding: 4px 10px; display: inline-block; margin-bottom: 12px; }
+    .split-tag.pet { background: rgba(139,92,246,0.12); color: var(--violet); }
+    .split-tag.of  { background: rgba(79,124,255,0.12); color: var(--accent); }
+    .split-side h4 { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+    .split-side p { font-size: 13px; color: var(--muted); line-height: 1.7; margin-bottom: 8px; }
+    .split-side p strong { color: var(--text); font-weight: 500; }
+    .example-chip {
+      background: var(--surface2); border: 1px solid var(--border); border-radius: 8px;
+      padding: 10px 14px; font-size: 12.5px; color: var(--muted); font-style: italic;
+      margin-top: 8px; line-height: 1.6;
+    }
+    .example-chip em { color: var(--text); font-style: normal; }
+
+    /* ── 4 ELEMENTOS STACK ── */
+    .elem-stack { margin-top: 22px; display: flex; flex-direction: column; gap: 10px; }
+    .elem-row {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+      padding: 18px 22px; display: flex; align-items: flex-start; gap: 16px;
+    }
+    .elem-num {
+      width: 32px; height: 32px; min-width: 32px; border-radius: 9px;
+      background: rgba(139,92,246,0.12); color: var(--violet);
+      font-size: 13px; font-weight: 800; display: flex; align-items: center; justify-content: center;
+    }
+    .elem-body h4 { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .elem-body p { font-size: 13px; color: var(--muted); line-height: 1.65; }
+    .elem-body p strong { color: var(--text); font-weight: 500; }
+    .elem-body .miss { font-size: 12px; color: var(--red); margin-top: 5px; font-style: italic; }
+
+    /* ── BEFORE / AFTER ── */
+    .ba-row { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; margin-top: 20px; }
+    @media (max-width: 560px) { .ba-row { grid-template-columns: 1fr; } }
+    .ba-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+    .ba-label { font-size: 10px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; display: block; }
+    .ba-label.bad { color: var(--red); }
+    .ba-label.good { color: var(--green); }
+    .ba-text { font-size: 13.5px; color: var(--text); line-height: 1.7; font-style: italic; }
+    .ba-note { font-size: 12px; color: var(--muted); margin-top: 8px; line-height: 1.5; }
+    .ba-arrow { font-size: 22px; color: var(--muted); text-align: center; }
+
+    /* ── HEBILLA ── */
+    .hebilla-wrap {
+      margin-top: 22px;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+      overflow: hidden;
+    }
+    .heb-row {
+      display: flex; align-items: flex-start; gap: 16px;
+      padding: 18px 22px; border-bottom: 1px solid rgba(42,47,62,0.5);
+    }
+    .heb-row:last-child { border-bottom: none; }
+    .heb-phase {
+      min-width: 110px; font-size: 11px; font-weight: 700; letter-spacing: 1.5px;
+      text-transform: uppercase; color: var(--violet); padding-top: 2px;
+    }
+    .heb-body { font-size: 13px; color: var(--muted); line-height: 1.65; }
+    .heb-body strong { color: var(--text); font-weight: 500; }
+    .heb-body em { color: var(--violet); font-style: italic; }
+
+    /* ── NO PEDIR BOX ── */
+    .costo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 18px; }
+    @media (max-width: 560px) { .costo-grid { grid-template-columns: 1fr; } }
+    .costo-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+      padding: 20px;
+    }
+    .costo-icon { font-size: 22px; margin-bottom: 8px; }
+    .costo-card h4 { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+    .costo-card p { font-size: 13px; color: var(--muted); line-height: 1.65; }
+    .costo-card p strong { color: var(--text); font-weight: 500; }
+
+    /* ── INFO / WARNING / QUOTE BOXES ── */
+    .info-box {
+      background: rgba(139,92,246,0.07); border: 1px solid rgba(139,92,246,0.2);
+      border-radius: 12px; padding: 18px 22px; margin-top: 16px;
+      font-size: 13.5px; color: var(--muted); line-height: 1.75;
+    }
+    .info-box strong { color: var(--text); font-weight: 600; }
+    .warning-box {
+      background: rgba(239,68,68,0.07); border: 1px solid rgba(239,68,68,0.2);
+      border-radius: 12px; padding: 16px 20px; margin-top: 16px;
+      font-size: 13.5px; color: var(--muted); line-height: 1.75;
+      display: flex; gap: 12px; align-items: flex-start;
+    }
+    .warning-box .wicon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+    .warning-box p strong { color: var(--text); font-weight: 500; }
+    .quote-block {
+      background: linear-gradient(135deg, rgba(139,92,246,0.07), rgba(79,124,255,0.05));
+      border: 1px solid rgba(139,92,246,0.2); border-radius: 14px;
+      padding: 28px 32px; margin-top: 22px;
+    }
+    .quote-block .qmark { font-size: 48px; line-height: 0.8; color: rgba(139,92,246,0.25); font-family: Georgia, serif; margin-bottom: 10px; display: block; }
+    .quote-block p { font-size: 15px; font-style: italic; color: var(--text); line-height: 1.8; font-weight: 300; max-width: 680px; }
+    .quote-block .qauthor { font-size: 12px; color: var(--muted); margin-top: 14px; letter-spacing: 0.5px; font-style: normal; }
+
+    /* ── DIVIDER ── */
+    .hr { border: none; border-top: 1px solid var(--border); margin: 56px 0; }
+
+    /* ── JUICIOS QUE BLOQUEAN ── */
+    .bloqueo-stack { margin-top: 22px; display: flex; flex-direction: column; gap: 10px; }
+    .bloqueo-item {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+      padding: 16px 20px; display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: flex-start;
+    }
+    .bloqueo-q {
+      font-size: 30px; font-family: Georgia, serif; color: rgba(139,92,246,0.22);
+      line-height: 0.85; padding-top: 5px; user-select: none;
+    }
+    .bloqueo-trigger {
+      font-size: 13.5px; font-style: italic; color: var(--text);
+      font-weight: 600; margin-bottom: 5px;
+    }
+    .bloqueo-reframe { font-size: 12.5px; color: var(--muted); line-height: 1.65; }
+    .bloqueo-reframe strong { color: var(--text); font-weight: 500; }
+
+    /* ── TRAMPAS DEL SÍ ── */
+    .trap-list { margin-top: 20px; display: flex; flex-direction: column; gap: 8px; }
+    .trap-item {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+      padding: 14px 20px; display: flex; align-items: flex-start; gap: 14px;
+    }
+    .trap-phrase {
+      font-size: 13px; font-style: italic; color: var(--text);
+      min-width: 190px; flex-shrink: 0; padding-top: 1px;
+    }
+    .trap-sep { color: var(--red); font-size: 14px; padding-top: 2px; flex-shrink: 0; }
+    .trap-meaning { font-size: 12.5px; color: var(--muted); line-height: 1.65; }
+    .trap-meaning strong { color: var(--text); font-weight: 500; }
+    @media (max-width: 560px) {
+      .trap-item { flex-direction: column; }
+      .trap-phrase { min-width: unset; }
+    }
+
+  </style>
+</head>
+<body>
+
+  <nav class="topnav">
+    <a class="back-btn" href="coaching-cierre.html">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+      Volver
+    </a>
+    <span class="topnav-sep">/</span>
+    <span class="topnav-title">Peticiones Efectivas</span>
+  </nav>
+
+  <div class="hero">
+    <div class="hero-eyebrow">Distinción 05</div>
+    <h1>Pedir es una <em>habilidad</em>,<br>no una debilidad</h1>
+    <p class="hero-sub">Las organizaciones son redes de compromisos. Cada compromiso comienza con una petición bien formulada —o fracasa por una que nunca se hizo.</p>
+  </div>
+
+  <div class="content">
+
+    <!-- 1. PETICIÓN vs OFERTA -->
+    <div class="section-block">
+      <span class="section-num">La distinción fundamental</span>
+      <h2 class="section-title">Petición y oferta: dos movimientos distintos</h2>
+      <p class="section-lead">Ambas son formas de iniciar una promesa. Lo que las diferencia es <strong>quién tiene la inquietud y quién ejecutará la acción</strong>.</p>
+
+      <div class="split-card">
+        <div class="split-side">
+          <span class="split-tag pet">Petición</span>
+          <h4>El orador tiene la inquietud</h4>
+          <p>Cuando pido, le estoy pidiendo al oyente que <strong>ejecute una acción para satisfacer mi necesidad</strong>. El oyente es quien se compromete a actuar.</p>
+          <div class="example-chip"><em>"Necesito el informe de gestión para el viernes a las 12."</em></div>
+        </div>
+        <div class="split-side">
+          <span class="split-tag of">Oferta</span>
+          <h4>El oyente tiene la inquietud</h4>
+          <p>Cuando ofrezco, <strong>yo me comprometo a actuar</strong> para hacerme cargo de una necesidad del otro. Si me acepta, ya no puedo retirarme sin incumplir.</p>
+          <div class="example-chip"><em>"Puedo revisar tu presentación antes del lunes, si lo necesitas."</em></div>
+        </div>
+      </div>
+
+      <div class="info-box">
+        Una promesa es como una <strong>hebilla</strong>: necesita dos lados para cerrarse. Petición u oferta abre el juego. Solo se cierra cuando el otro <strong>declara aceptación</strong>. Sin ese "sí", no hay promesa —hay solo una intención expresada.
+      </div>
+    </div>
+
+    <!-- 2. LOS ELEMENTOS -->
+    <div class="section-block">
+      <span class="section-num">La herramienta</span>
+      <h2 class="section-title">Los elementos de una petición completa</h2>
+      <p class="section-lead">Cuando alguno de estos elementos falta o queda ambiguo, orador y oyente operan creyendo que acordaron lo mismo —cuando no lo hicieron. Ese es el origen de la mayoría de los malentendidos en coordinación.</p>
+
+      <div class="elem-stack">
+
+        <div class="elem-row">
+          <div class="elem-num">1</div>
+          <div class="elem-body">
+            <h4>Orador y oyente</h4>
+            <p>¿Quién le está pidiendo exactamente a quién? La petición debe ser <strong>personalizada y dirigida</strong>. Una petición "al aire" —en una reunión sin destinatario claro— no genera compromiso de nadie.</p>
+            <div class="miss">Error frecuente: "Alguien debería encargarse de esto." → Nadie lo hará.</div>
+          </div>
+        </div>
+
+        <div class="elem-row">
+          <div class="elem-num">2</div>
+          <div class="elem-body">
+            <h4>Algo que falta — la inquietud</h4>
+            <p>¿Por qué estás pidiendo? Toda petición nace de una <strong>inquietud: algo que falta y no ocurrirá por sí solo</strong>. Identificarla es importante porque quien escucha puede encontrar formas de satisfacerla mejores que la acción específicamente pedida. Pedimos acciones, pero lo que buscamos resolver son inquietudes.</p>
+            <div class="miss">Preguntar: ¿Qué le inquieta a quien pide? ¿Por qué pide esto? ¿De qué problema procura hacerse cargo?</div>
+          </div>
+        </div>
+
+        <div class="elem-row">
+          <div class="elem-num">3</div>
+          <div class="elem-body">
+            <h4>Acción futura — el pedido concreto</h4>
+            <p>¿Qué acción específica estás solicitando? Pedir "apoyo", "ayuda" o "más compromiso" es pedir un <strong>juicio, no una acción</strong>. Distintas personas interpretan "apoyo" de formas radicalmente distintas. Para evitarlo, la petición debe especificar qué acciones concretas deben ocurrir.</p>
+            <div class="miss">Error frecuente: "Necesito que me apoyes con el lanzamiento." → ¿Qué significa apoyo exactamente?</div>
+          </div>
+        </div>
+
+        <div class="elem-row">
+          <div class="elem-num">4</div>
+          <div class="elem-body">
+            <h4>Condiciones de satisfacción</h4>
+            <p>¿Cómo sabrás que lo que recibes está bien? ¿Qué estándar, formato o nivel de calidad se espera? Si las condiciones no son explícitas, cada parte asume las suyas. <strong>La promesa no se cierra cuando el ejecutor cree haber terminado</strong>, sino cuando el orador declara satisfacción.</p>
+            <div class="miss">Error frecuente: definir lo que se quiere solo después de recibir algo que no era.</div>
+          </div>
+        </div>
+
+        <div class="elem-row">
+          <div class="elem-num">5</div>
+          <div class="elem-body">
+            <h4>El tiempo — plazo explícito</h4>
+            <p>¿Para cuándo exactamente? <strong>Una petición sin plazo no es una promesa</strong>: quien prometió siempre puede argumentar que lo hará "más tarde". Sin fecha, no hay incumplimiento posible —y por tanto tampoco hay compromiso real.</p>
+            <div class="miss">Error frecuente: "cuando puedas", "pronto", "esta semana" sin día ni hora específicos.</div>
+          </div>
+        </div>
+
+        <div class="elem-row">
+          <div class="elem-num">6</div>
+          <div class="elem-body">
+            <h4>Trasfondo compartido de obviedad</h4>
+            <p>Toda conversación ocurre sobre supuestos implícitos que no se dicen —porque "se entienden". El problema: <strong>lo que es obvio para uno puede no serlo para el otro</strong>. A menos experiencia compartida, más explícitas deben ser las condiciones. Este trasfondo puede expandirse intencionalmente con conversaciones previas y estándares de equipo.</p>
+            <div class="miss">Riesgo: asumir que el oyente sabe el formato, el nivel de detalle o el contexto que da sentido a la petición.</div>
+          </div>
+        </div>
+
+        <div class="elem-row">
+          <div class="elem-num">7</div>
+          <div class="elem-body">
+            <h4>Confianza</h4>
+            <p>¿Confías en quien le pides —en su sinceridad, su competencia y su sentido de responsabilidad? <strong>Sin confianza, el "sí" no vale</strong>: no puedes actuar sobre la base de una promesa que en el fondo no esperas que se cumpla. Tampoco tiene sentido pedir a alguien en quien no confías.</p>
+            <div class="miss">La confianza opera en tres dominios: sinceridad (dice lo que piensa), competencia (puede hacerlo), responsabilidad (se hará cargo si algo falla).</div>
+          </div>
+        </div>
+
+        <div class="elem-row">
+          <div class="elem-num">8</div>
+          <div class="elem-body">
+            <h4>El medio</h4>
+            <p>¿Cómo se hace la petición? <strong>El canal cambia el peso del compromiso</strong>. Un mensaje de WhatsApp, un correo, una llamada y una conversación cara a cara no generan el mismo nivel de formalidad ni la misma trazabilidad. Para compromisos críticos, el medio debe estar a la altura de lo que se está acordando.</p>
+            <div class="miss">Error frecuente: acordar algo importante en un mensaje de voz que nadie puede releer ni referenciar después.</div>
+          </div>
+        </div>
+
+        <div class="elem-row">
+          <div class="elem-num">9</div>
+          <div class="elem-body">
+            <h4>La declaración de aceptación</h4>
+            <p>La promesa no existe hasta que el oyente declara que acepta. <strong>El oyente siempre tiene tres opciones legítimas</strong>: aceptar tal como está, proponer condiciones distintas (contra-oferta), o declinar. Un equipo donde nadie puede decir "No" tiene compromisos frágiles disfrazados de coordinación.</p>
+            <div class="miss">Error frecuente: asumir que el silencio, el "ok" vago o el "haré lo posible" equivalen a un compromiso real.</div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="info-box" style="margin-top: 16px;">
+        <strong>Dos factores que también inciden en el resultado:</strong><br><br>
+        <strong>Emocionalidad —</strong> La misma petición, desde estados emocionales distintos, genera respuestas muy diferentes. Pedir desde la urgencia, el enojo o la desconfianza contamina el espacio antes de que el oyente pueda siquiera escuchar.<br><br>
+        <strong>Modalidad del pedir —</strong> No es lo mismo decir <em>"te pido"</em> que <em>"te ruego"</em>, <em>"te sugiero"</em> o <em>"te exijo"</em>. Cada verbo señala un poder relativo distinto y le deja al oyente un espacio diferente para decir que no.
+      </div>
+    </div>
+
+    <!-- 3. QUEJA vs PETICIÓN -->
+    <div class="section-block">
+      <span class="section-num">El error más común</span>
+      <h2 class="section-title">Confundir queja con petición</h2>
+      <p class="section-lead">Expresar malestar no es lo mismo que pedir un cambio. Cuando el equipo confunde ambos, las cosas siguen igual —y el resentimiento crece.</p>
+
+      <div class="ba-row">
+        <div class="ba-card">
+          <span class="ba-label bad">Queja (no genera compromiso)</span>
+          <p class="ba-text">"A mí no me gusta cómo se están coordinando las publicaciones."</p>
+          <p class="ba-note">Expresa una insatisfacción. El otro puede escuchar, asentir, y no cambiar nada —porque no se le pidió nada concreto.</p>
+        </div>
+        <div class="ba-arrow">→</div>
+        <div class="ba-card">
+          <span class="ba-label good">Petición (genera promesa)</span>
+          <p class="ba-text">"Ana, necesito que el calendario de publicaciones de la próxima semana esté aprobado por mí antes del miércoles a las 15:00."</p>
+          <p class="ba-note">Tiene orador, oyente, condición de satisfacción y plazo. Ana puede aceptar, negociar el plazo, o decir que no.</p>
+        </div>
+      </div>
+
+      <div class="warning-box">
+        <span class="wicon">⚠️</span>
+        <p>Muchos equipos caen en el resentimiento culpando a otros por no cumplir promesas que <strong>jamás se atrevieron a pedir</strong>. Esperaban que los demás descubrieran, casi por arte de magia, lo que les inquietaba. El resentimiento acumulado es el precio de no pedir.</p>
+      </div>
+    </div>
+
+    <!-- 3.5. JUICIOS QUE BLOQUEAN EL PEDIR -->
+    <div class="section-block">
+      <span class="section-num">Por qué no pedimos</span>
+      <h2 class="section-title">Los juicios que bloquean el pedir</h2>
+      <p class="section-lead">Antes de formular la petición, algo nos frena. Casi siempre es un juicio —una interpretación no examinada sobre lo que va a pasar. Echeverría identifica los más frecuentes y su costo real.</p>
+
+      <div class="bloqueo-stack">
+
+        <div class="bloqueo-item">
+          <div class="bloqueo-q">"</div>
+          <div>
+            <div class="bloqueo-trigger">Descubrirán que no sé.</div>
+            <div class="bloqueo-reframe">Si pides, es precisamente porque <strong>no sabes lo que otro sabe</strong>. La ignorancia ya existe; no pedir solo la perpetúa —y bloquea la posibilidad de aprender. El pedir es la herramienta para hacerse cargo de lo que uno no sabe.</div>
+          </div>
+        </div>
+
+        <div class="bloqueo-item">
+          <div class="bloqueo-q">"</div>
+          <div>
+            <div class="bloqueo-trigger">Voy a mostrar que soy vulnerable.</div>
+            <div class="bloqueo-reframe">Todos lo somos. El pedir es precisamente <strong>la herramienta para hacerse cargo de esa vulnerabilidad</strong>. No pedir es elegir seguir siéndola —en silencio y en soledad. Además: la vulnerabilidad que queremos esconder suele ser visible de otras maneras.</div>
+          </div>
+        </div>
+
+        <div class="bloqueo-item">
+          <div class="bloqueo-q">"</div>
+          <div>
+            <div class="bloqueo-trigger">Si pido, quedo comprometido a reciprocar.</div>
+            <div class="bloqueo-reframe">Pedir no crea deuda automática. <strong>Siempre puedes declinar</strong> las peticiones que te lleguen después. Lo que sí crea el pedir es relación. Y sin ella, la vida y el trabajo se empobrecen.</div>
+          </div>
+        </div>
+
+        <div class="bloqueo-item">
+          <div class="bloqueo-q">"</div>
+          <div>
+            <div class="bloqueo-trigger">¿Quién soy yo para pedirle esto...?</div>
+            <div class="bloqueo-reframe">Este juicio esconde un problema de <strong>dignidad</strong>: le estás asignando al otro un valor mayor al tuyo, sin fundamento. El espacio para pedir no se clausura del todo casi nunca. Pregúntate: ¿está realmente justificado ese diferencial de valor?</div>
+          </div>
+        </div>
+
+        <div class="bloqueo-item">
+          <div class="bloqueo-q">"</div>
+          <div>
+            <div class="bloqueo-trigger">Me van a decir que no.</div>
+            <div class="bloqueo-reframe">El "no" rechaza la <strong>acción pedida</strong>, no a la persona que pide. Confundirlos lleva a no pedir nunca —o a manipular al otro para que no pueda negarse. Nota: si el otro no puede decirte "no", no le estás pidiendo; le estás ordenando.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <hr class="hr" />
+
+    <!-- 4. EL COSTO DE NO PEDIR -->
+    <div class="section-block">
+      <span class="section-num">Más allá de la técnica</span>
+      <h2 class="section-title">El costo de no pedir</h2>
+      <p class="section-lead">No pedir es también una conducta. Y tiene consecuencias en la identidad del equipo y en la calidad de su coordinación.</p>
+
+      <div class="costo-grid">
+        <div class="costo-card">
+          <div class="costo-icon">🔇</div>
+          <h4>Quien no pide no coordina</h4>
+          <p>Hay quienes saben pedir en familia pero no en la oficina. Esperan que los demás "adivinen" sus necesidades. Al no ocurrir, <strong>interpretan el incumplimiento como falta de interés o de respeto</strong> —cuando en realidad nunca hubo petición.</p>
+        </div>
+        <div class="costo-card">
+          <div class="costo-icon">🤐</div>
+          <h4>Quien no ofrece no aparece</h4>
+          <p>No hacer ofertas equivale a asumir un papel pasivo. Quien no se muestra como posibilidad para otros queda sujeto al accidente del descubrimiento. <strong>Nadie puede comprometerse con lo que no se ofrece.</strong></p>
+        </div>
+      </div>
+
+      <div class="quote-block">
+        <span class="qmark">"</span>
+        <p>No es que siendo como somos, no pidamos; más bien, el no pedir nos hace ser como somos y nos confiere una forma de vida correspondiente. Si comenzamos a pedir donde no lo hacemos, transformamos nuestra forma de ser.</p>
+        <div class="qauthor">— Rafael Echeverría, Ontología del Lenguaje</div>
+      </div>
+    </div>
+
+    <!-- 5. CUANDO EL OYENTE RESPONDE -->
+    <div class="section-block">
+      <span class="section-num">El cierre de la promesa</span>
+      <h2 class="section-title">Cómo se cierra y cómo se rompe una promesa</h2>
+      <p class="section-lead">La promesa no se cierra cuando quien prometió <em>cree</em> que cumplió. Se cierra cuando <strong>el oyente declara satisfacción</strong>.</p>
+
+      <div class="hebilla-wrap">
+        <div class="heb-row">
+          <div class="heb-phase">Apertura</div>
+          <div class="heb-body">Se hace la petición u oferta con los 4 elementos completos. <strong>Primer lado de la hebilla.</strong></div>
+        </div>
+        <div class="heb-row">
+          <div class="heb-phase">Aceptación</div>
+          <div class="heb-body">El oyente declara que acepta. <em>Ahora existe la promesa.</em> Sin este paso, el compromiso no existe.</div>
+        </div>
+        <div class="heb-row">
+          <div class="heb-phase">Ejecución</div>
+          <div class="heb-body">Quien se comprometió ejecuta la acción. Pero <strong>la promesa aún no está cerrada.</strong></div>
+        </div>
+        <div class="heb-row">
+          <div class="heb-phase">Satisfacción</div>
+          <div class="heb-body">El oyente original examina si la acción cumple las condiciones acordadas y <strong>declara satisfacción</strong>. Segundo lado de la hebilla: <em>la promesa se cierra.</em></div>
+        </div>
+      </div>
+
+      <div class="info-box" style="margin-top: 16px;">
+        <strong>Para el equipo:</strong> cuando alguien dice "ya terminé" y el otro responde "esto no es lo que pedí", el problema casi siempre está en el paso 1 —las condiciones de satisfacción no eran suficientemente claras. La declaración de satisfacción no es formalidad: es el cierre real del compromiso.
+      </div>
+    </div>
+
+    <!-- 6. EL NO LEGÍTIMO -->
+    <div class="section-block">
+      <span class="section-num">Lo que protege la calidad de los compromisos</span>
+      <h2 class="section-title">El "No" como parte de la danza</h2>
+      <p class="section-lead">Un equipo donde nadie puede decir "No" tiene compromisos frágiles. Los "sí" que no se cumplen son más costosos que los "no" que se dijeron a tiempo.</p>
+
+      <div class="costo-grid">
+        <div class="costo-card">
+          <div class="costo-icon">🚫</div>
+          <h4>Declinar una petición es legítimo</h4>
+          <p>El oyente siempre tiene la opción de <strong>no aceptar</strong>. Si un equipo no puede ejercerla, los compromisos se adquieren por presión social y se incumplen en silencio —lo que destruye la confianza de forma más profunda.</p>
+        </div>
+        <div class="costo-card">
+          <div class="costo-icon">↔️</div>
+          <h4>La contra-propuesta como herramienta</h4>
+          <p>Frente a una petición, el oyente puede ofrecer condiciones distintas: otro plazo, otro alcance, otro formato. <strong>Negociar las condiciones es más honesto que aceptar algo que no se puede cumplir.</strong></p>
+        </div>
+      </div>
+
+      <div class="info-box">
+        <strong>Tres respuestas siempre válidas a una petición:</strong> &nbsp;Acepto tal como está · &nbsp;Propongo estas condiciones distintas · &nbsp;No puedo comprometerme con esto ahora.<br><br>
+        Si el equipo solo puede dar la primera, los compromisos no son reales.
+      </div>
+    </div>
+
+    <!-- 7. LAS TRAMPAS DEL SÍ AMBIGUO -->
+    <div class="section-block">
+      <span class="section-num">La trampa más costosa</span>
+      <h2 class="section-title">Las trampas del "sí" ambiguo</h2>
+      <p class="section-lead">El problema no siempre es no poder decir "No". A veces es el "Sí" que no lo es. Echeverría advierte: <strong>es preferible un "no" oportuno que un "sí" que después se esfumará</strong>.</p>
+
+      <div class="trap-list">
+        <div class="trap-item">
+          <div class="trap-phrase">"No te preocupes"</div>
+          <div class="trap-sep">→</div>
+          <div class="trap-meaning">No define qué, cómo ni cuándo. <strong>Cuando alguien responde esto, es el momento de empezar a preocuparse.</strong></div>
+        </div>
+        <div class="trap-item">
+          <div class="trap-phrase">"Haré lo posible"</div>
+          <div class="trap-sep">→</div>
+          <div class="trap-meaning">Se compromete a <em>intentarlo</em>, no a cumplir. Es legítimo como declaración de intención —pero <strong>no es una promesa</strong>, y no puede exigirse como tal.</div>
+        </div>
+        <div class="trap-item">
+          <div class="trap-phrase">"Trataré"</div>
+          <div class="trap-sep">→</div>
+          <div class="trap-meaning">Misma trampa. Quien responde así nunca podrá incumplir formalmente porque <strong>nunca prometió</strong>. Podemos "tratar" indefinidamente sin resultado.</div>
+        </div>
+        <div class="trap-item">
+          <div class="trap-phrase">"Dalo por hecho"</div>
+          <div class="trap-sep">→</div>
+          <div class="trap-meaning">Paradójicamente, una de las respuestas menos confiables. Sin condiciones de satisfacción ni plazo explícito, <strong>el compromiso queda flotando en el aire</strong>.</div>
+        </div>
+        <div class="trap-item">
+          <div class="trap-phrase">"Déjalo en mis manos"</div>
+          <div class="trap-sep">→</div>
+          <div class="trap-meaning">Suena seguro pero no confirma ni plazo ni forma. El oyente toma control —sin que quede claro cuándo ni bajo qué condiciones <strong>el orador declarará satisfacción</strong>.</div>
+        </div>
+      </div>
+
+      <div class="warning-box" style="margin-top: 16px;">
+        <span class="wicon">⚠️</span>
+        <p>Cuando el equipo normaliza el "sí" ambiguo, <strong>los compromisos pierden valor real</strong>. Quien pidió asume cumplimientos que no existen y toma decisiones sobre esa base. El daño —en productividad, en confianza y en identidad— es significativo y casi siempre silencioso.</p>
+      </div>
+
+      <div class="quote-block" style="margin-top: 22px;">
+        <span class="qmark">"</span>
+        <p>El arte de saber pedir es una de las competencias conversacionales claves en la vida de los individuos y en el desempeño de las organizaciones.</p>
+        <div class="qauthor">— Rafael Echeverría, <em>Peticiones: Camino hacia las promesas</em></div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+
+</body>
+</html>

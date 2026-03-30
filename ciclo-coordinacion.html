@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>El Ciclo de la Promesa — Coordinación de Acciones</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #0F1117;
+      --surface: #181B23;
+      --surface2:#1F2330;
+      --border:  #2A2F3E;
+      --accent:  #4F7CFF;
+      --cyan:    #06B6D4;
+      --cyan2:   #0891B2;
+      --gold:    #F59E0B;
+      --red:     #EF4444;
+      --green:   #10B981;
+      --violet:  #8B5CF6;
+      --text:    #E8ECF5;
+      --muted:   #8892AA;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    .topnav {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(15,17,23,0.90); backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 32px; display: flex; align-items: center; gap: 12px;
+    }
+    .back-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 13px; font-weight: 500; color: var(--muted); text-decoration: none;
+      transition: color 0.15s;
+    }
+    .back-btn:hover { color: var(--text); }
+    .topnav-sep { color: var(--border); font-size: 18px; }
+    .topnav-title { font-size: 13px; font-weight: 600; color: var(--text); }
+
+    .hero {
+      position: relative; overflow: hidden;
+      padding: 80px 32px 64px; text-align: center;
+    }
+    .hero::before {
+      content: ''; position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 65% 55% at 50% 0%, rgba(6,182,212,0.10) 0%, transparent 65%),
+        radial-gradient(ellipse 40% 35% at 80% 90%, rgba(79,124,255,0.07) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 11px; font-weight: 600; letter-spacing: 2.5px;
+      text-transform: uppercase; color: var(--cyan); margin-bottom: 18px;
+      border: 1px solid rgba(6,182,212,0.3); border-radius: 20px;
+      padding: 5px 14px; background: rgba(6,182,212,0.07);
+    }
+    .hero h1 { font-size: clamp(26px, 4.5vw, 46px); font-weight: 700; line-height: 1.15; margin-bottom: 12px; }
+    .hero h1 em {
+      font-style: normal;
+      background: linear-gradient(135deg, var(--cyan), #67E8F9);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .hero-sub { font-size: 15px; color: var(--muted); max-width: 620px; margin: 0 auto; line-height: 1.7; }
+
+    .content { max-width: 900px; margin: 0 auto; padding: 0 32px 100px; }
+
+    .section-block { margin-bottom: 58px; }
+    .section-num { font-size: 11px; font-weight: 700; letter-spacing: 2px; color: var(--cyan); text-transform: uppercase; margin-bottom: 8px; display: block; }
+    .section-title { font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 12px; line-height: 1.3; }
+    .section-lead { font-size: 14.5px; color: var(--muted); line-height: 1.8; max-width: 760px; }
+    .section-lead strong { color: var(--text); font-weight: 500; }
+
+    .ciclo-phase {
+      font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--cyan); margin-bottom: 5px;
+    }
+
+    .split-card {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+      margin-top: 24px; border: 1px solid var(--border); border-radius: 14px; overflow: hidden;
+    }
+    @media (max-width: 580px) { .split-card { grid-template-columns: 1fr; } }
+    .split-side { padding: 26px; }
+    .split-side:first-child { border-right: 1px solid var(--border); background: rgba(239,68,68,0.04); }
+    .split-side:last-child { background: rgba(16,185,129,0.04); }
+    .split-tag { font-size: 10px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; border-radius: 5px; padding: 4px 10px; display: inline-block; margin-bottom: 12px; }
+    .split-tag.bad  { background: rgba(239,68,68,0.12); color: var(--red); }
+    .split-tag.good { background: rgba(16,185,129,0.12); color: var(--green); }
+    .split-side h4 { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+    .split-side p { font-size: 13px; color: var(--muted); line-height: 1.7; margin-bottom: 8px; }
+    .split-side p strong { color: var(--text); font-weight: 500; }
+
+    .confianza-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 20px;
+    }
+    @media (max-width: 580px) { .confianza-grid { grid-template-columns: 1fr; } }
+    .conf-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+      padding: 20px 18px;
+    }
+    .conf-icon { font-size: 24px; margin-bottom: 10px; }
+    .conf-card h4 { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+    .conf-card p { font-size: 12.5px; color: var(--muted); line-height: 1.65; }
+    .conf-card p strong { color: var(--text); font-weight: 500; }
+
+    .elem-stack { margin-top: 22px; display: flex; flex-direction: column; gap: 10px; }
+    .elem-row {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+      padding: 18px 22px; display: flex; align-items: flex-start; gap: 16px;
+    }
+    .elem-icon {
+      width: 36px; height: 36px; min-width: 36px; border-radius: 10px;
+      background: rgba(6,182,212,0.10); color: var(--cyan);
+      font-size: 16px; display: flex; align-items: center; justify-content: center;
+    }
+    .elem-body h4 { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .elem-body p { font-size: 13px; color: var(--muted); line-height: 1.65; }
+    .elem-body p strong { color: var(--text); font-weight: 500; }
+    .elem-body .miss { font-size: 12px; color: var(--red); margin-top: 5px; font-style: italic; }
+    .elem-body .tip  { font-size: 12px; color: var(--green); margin-top: 5px; font-style: italic; }
+
+    .info-box {
+      background: rgba(6,182,212,0.07); border: 1px solid rgba(6,182,212,0.2);
+      border-radius: 12px; padding: 18px 22px; margin-top: 16px;
+      font-size: 13.5px; color: var(--muted); line-height: 1.75;
+    }
+    .info-box strong { color: var(--text); font-weight: 600; }
+    .warning-box {
+      background: rgba(239,68,68,0.07); border: 1px solid rgba(239,68,68,0.2);
+      border-radius: 12px; padding: 16px 20px; margin-top: 16px;
+      font-size: 13.5px; color: var(--muted); line-height: 1.75;
+      display: flex; gap: 12px; align-items: flex-start;
+    }
+    .warning-box .wicon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+    .warning-box p strong { color: var(--text); font-weight: 500; }
+    .quote-block {
+      background: linear-gradient(135deg, rgba(6,182,212,0.07), rgba(79,124,255,0.05));
+      border: 1px solid rgba(6,182,212,0.2); border-radius: 14px;
+      padding: 28px 32px; margin-top: 22px;
+    }
+    .quote-block .qmark { font-size: 48px; line-height: 0.8; color: rgba(6,182,212,0.22); font-family: Georgia, serif; margin-bottom: 10px; display: block; }
+    .quote-block p { font-size: 15px; font-style: italic; color: var(--text); line-height: 1.8; font-weight: 300; max-width: 680px; }
+    .quote-block .qauthor { font-size: 12px; color: var(--muted); margin-top: 14px; letter-spacing: 0.5px; font-style: normal; }
+
+    .reclamo-steps { margin-top: 20px; display: flex; flex-direction: column; gap: 14px; }
+    .reclamo-step {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+      padding: 20px 22px;
+    }
+    .reclamo-step-num {
+      font-size: 11px; font-weight: 800; color: var(--cyan); letter-spacing: 1.5px;
+      margin-bottom: 6px; display: block;
+    }
+    .reclamo-step h4 { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+    .reclamo-step .reclamo-frase {
+      font-size: 13px; font-style: italic; color: var(--cyan); line-height: 1.6;
+      margin-bottom: 8px; padding-left: 12px; border-left: 2px solid rgba(6,182,212,0.3);
+    }
+    .reclamo-step p { font-size: 12.5px; color: var(--muted); line-height: 1.7; }
+    .reclamo-step p strong { color: var(--text); font-weight: 500; }
+
+    .fases-grid {
+      margin-top: 32px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+    }
+    @media (max-width: 580px) { .fases-grid { grid-template-columns: 1fr; } }
+    .fase-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px;
+    }
+    .fase-card h4 { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+    .fase-card p { font-size: 12.5px; color: var(--muted); line-height: 1.7; }
+    .fase-card p strong { color: var(--text); font-weight: 500; }
+
+    .hr { border: none; border-top: 1px solid var(--border); margin: 56px 0; }
+
+    @media (max-width: 580px) {
+      .ciclo-svg-container svg { max-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="topnav">
+    <a class="back-btn" href="coaching-cierre.html">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+      Volver
+    </a>
+    <span class="topnav-sep">/</span>
+    <span class="topnav-title">Ciclo de Coordinación de Acciones</span>
+  </nav>
+
+  <div class="hero">
+    <div class="hero-eyebrow">Distinción 06</div>
+    <h1>Ciclo de <em>Coordinación</em><br>de Acciones</h1>
+    <p class="hero-sub">En todo equipo, cada persona hace una parte del trabajo. Para que eso funcione bien, alguien tiene que pedir, alguien tiene que comprometerse, alguien tiene que cumplir — y alguien tiene que confirmar que quedó bien. A ese circuito lo llamamos el ciclo de coordinación de acciones.</p>
+  </div>
+
+  <div class="content">
+
+    <!-- 1. EL FUNDAMENTO -->
+    <div class="section-block">
+      <span class="section-num">El fundamento</span>
+      <h2 class="section-title">¿Por qué coordinar las acciones importa tanto?</h2>
+      <p class="section-lead">En toda organización, las personas se distribuyen el trabajo: no todos hacen lo mismo. Pero una vez que el trabajo se divide, es necesario <strong>articularlo</strong> — juntar lo que se ha separado. Ese es el papel del ciclo de coordinación de acciones, y su unidad fundamental es el compromiso que asumimos cuando decimos "sí".</p>
+
+      <div class="info-box" style="margin-top: 20px;">
+        Todo flujo de trabajo es una <strong>cadena de compromisos</strong>. Si algún eslabón falla, el resultado final también falla. Por eso no basta que algunas personas sean muy buenas en lo técnico: la efectividad real depende de que todos sepan coordinar sus compromisos.
+      </div>
+
+      <div class="split-card" style="margin-top:20px;">
+        <div class="split-side" style="background:rgba(79,124,255,0.04);">
+          <span class="split-tag" style="background:rgba(79,124,255,0.12); color:var(--accent);">ACCIONES ESPECÍFICAS</span>
+          <h4>Lo que se hace</h4>
+          <p>Son las tareas concretas a las que una promesa se compromete: elaborar un informe, procesar una muestra, atender un paciente. Son las <strong>competencias técnicas</strong> individuales.</p>
+        </div>
+        <div class="split-side" style="background:rgba(6,182,212,0.04);">
+          <span class="split-tag" style="background:rgba(6,182,212,0.12); color:var(--cyan);">ACCIONES DE COORDINACIÓN</span>
+          <h4>Cómo se articula lo que se hace</h4>
+          <p>Son las acciones involucradas en constituir y cumplir una promesa: <strong>pedir, ofrecer, negociar, declarar cumplimiento, evaluar</strong>. Es donde se juega la efectividad real del equipo.</p>
+        </div>
+      </div>
+
+      <div class="info-box">
+        <strong>La conclusión clave:</strong> las habilidades técnicas individuales no son suficientes para que un equipo funcione bien. Un equipo de buenos especialistas que no sabe coordinar sus compromisos puede ser menos efectivo que uno de profesionales competentes que sí lo sabe hacer.
+      </div>
+    </div>
+
+    <!-- 2. EL CICLO — DIAGRAMA SVG -->
+    <div class="section-block">
+      <span class="section-num">El modelo</span>
+      <h2 class="section-title">El ciclo de coordinación de acciones</h2>
+      <p class="section-lead">El ciclo tiene dos grandes momentos: el <strong>compromiso</strong> (acordar qué se hará) y el <strong>cumplimiento</strong> (hacerlo y cerrarlo). Cada momento tiene dos fases. En el centro del ciclo hay dos factores presentes en todo momento: la confianza y el contexto compartido entre quien pide y quien ejecuta.</p>
+
+      <div class="ciclo-svg-container" style="margin-top:28px; display:flex; justify-content:center;">
+        <div class="ciclo-interactive" style="position:relative; width:100%; max-width:820px;">
+        <svg viewBox="0 0 820 780" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto; display:block;" font-family="'DM Sans', sans-serif">
+          <defs>
+            <marker id="arrowCyan" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto" markerUnits="strokeWidth">
+              <path d="M0,0 L8,3 L0,6 Z" fill="#06B6D4"/>
+            </marker>
+            <marker id="arrowMuted" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto" markerUnits="strokeWidth">
+              <path d="M0,0 L7,2.5 L0,5 Z" fill="#5A6380"/>
+            </marker>
+            <filter id="glowCenter" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="8" result="blur"/>
+              <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+            </filter>
+            <style>
+              .clickable { cursor: pointer; }
+              .clickable:hover rect, .clickable:hover circle { filter: brightness(1.3); }
+              .clickable:hover text { fill: #E8ECF5 !important; }
+              .click-hint { font-size: 7.5px; fill: #5A6380; letter-spacing: 0.5px; }
+            </style>
+          </defs>
+
+          <rect width="820" height="780" rx="16" fill="#181B23"/>
+
+          <!-- Etapa labels -->
+          <text x="410" y="88" text-anchor="middle" font-size="10" font-weight="600" letter-spacing="2" fill="#5A6380">ETAPA 1 · CONSTITUCIÓN DE LA PROMESA</text>
+          <line x1="210" y1="97" x2="610" y2="97" stroke="#2A2F3E" stroke-width="1"/>
+          <text x="410" y="672" text-anchor="middle" font-size="10" font-weight="600" letter-spacing="2" fill="#5A6380">ETAPA 2 · CUMPLIMIENTO DE LA PROMESA</text>
+          <line x1="210" y1="658" x2="610" y2="658" stroke="#2A2F3E" stroke-width="1"/>
+
+          <!-- Main circle + quadrant dividers -->
+          <circle cx="410" cy="378" r="220" fill="none" stroke="#2A2F3E" stroke-width="1.5"/>
+          <line x1="410" y1="158" x2="410" y2="598" stroke="#2A2F3E" stroke-width="1" stroke-dasharray="4,4"/>
+          <line x1="190" y1="378" x2="630" y2="378" stroke="#2A2F3E" stroke-width="1" stroke-dasharray="4,4"/>
+
+          <!-- Quadrant labels -->
+          <text x="308" y="278" text-anchor="middle" font-size="11" font-weight="700" letter-spacing="1.5" fill="#06B6D4" opacity="0.75">1) CREACIÓN DE</text>
+          <text x="308" y="293" text-anchor="middle" font-size="11" font-weight="700" letter-spacing="1.5" fill="#06B6D4" opacity="0.75">CONTEXTO</text>
+          <text x="512" y="285" text-anchor="middle" font-size="11" font-weight="700" letter-spacing="1.5" fill="#06B6D4" opacity="0.75">2) NEGOCIACIÓN</text>
+          <text x="512" y="471" text-anchor="middle" font-size="11" font-weight="700" letter-spacing="1.5" fill="#06B6D4" opacity="0.75">3) REALIZACIÓN</text>
+          <text x="308" y="471" text-anchor="middle" font-size="11" font-weight="700" letter-spacing="1.5" fill="#06B6D4" opacity="0.75">4) EVALUACIÓN</text>
+
+          <!-- ═══ CENTER: Clickeable ═══ -->
+          <g class="clickable" data-popup="centro">
+            <circle cx="410" cy="378" r="74" fill="rgba(6,182,212,0.06)" stroke="rgba(6,182,212,0.25)" stroke-width="1.5" filter="url(#glowCenter)"/>
+            <text x="410" y="365" text-anchor="middle" font-size="10" font-weight="600" letter-spacing="1" fill="#8892AA">CONTEXTO</text>
+            <text x="410" y="379" text-anchor="middle" font-size="10" font-weight="600" letter-spacing="1" fill="#8892AA">COMPARTIDO</text>
+            <text x="410" y="408" text-anchor="middle" font-size="13" font-weight="800" letter-spacing="2" fill="#06B6D4">CONFIANZA</text>
+            <text x="410" y="436" text-anchor="middle" class="click-hint">clic para más info</text>
+          </g>
+
+          <!-- Flow arrows (clockwise) -->
+          <path d="M 285,198 A 220,220 0 0,1 525,195" fill="none" stroke="#06B6D4" stroke-width="2" marker-end="url(#arrowCyan)" opacity="0.55"/>
+          <path d="M 595,275 A 220,220 0 0,1 595,490" fill="none" stroke="#06B6D4" stroke-width="2" marker-end="url(#arrowCyan)" opacity="0.55"/>
+          <path d="M 525,562 A 220,220 0 0,1 290,560" fill="none" stroke="#06B6D4" stroke-width="2" marker-end="url(#arrowCyan)" opacity="0.55"/>
+          <path d="M 225,490 A 220,220 0 0,1 225,268" fill="none" stroke="#06B6D4" stroke-width="2" marker-end="url(#arrowCyan)" opacity="0.55"/>
+
+          <!-- ═══ CLIENTE: Clickeable, limpio ═══ -->
+          <g class="clickable" data-popup="cliente">
+            <rect x="14" y="340" width="118" height="76" rx="10" fill="rgba(79,124,255,0.08)" stroke="rgba(79,124,255,0.3)" stroke-width="1.5"/>
+            <text x="73" y="370" text-anchor="middle" font-size="12" font-weight="800" letter-spacing="2.5" fill="#4F7CFF">CLIENTE</text>
+            <text x="73" y="390" text-anchor="middle" font-size="9.5" fill="#8892AA">▸ ver más</text>
+            <text x="73" y="408" text-anchor="middle" class="click-hint">clic para más info</text>
+          </g>
+
+          <!-- ═══ EJECUTOR: Clickeable, limpio ═══ -->
+          <g class="clickable" data-popup="ejecutor">
+            <rect x="688" y="340" width="118" height="76" rx="10" fill="rgba(245,158,11,0.08)" stroke="rgba(245,158,11,0.3)" stroke-width="1.5"/>
+            <text x="747" y="370" text-anchor="middle" font-size="12" font-weight="800" letter-spacing="2" fill="#F59E0B">EJECUTOR</text>
+            <text x="747" y="390" text-anchor="middle" font-size="9.5" fill="#8892AA">▸ ver más</text>
+            <text x="747" y="408" text-anchor="middle" class="click-hint">clic para más info</text>
+          </g>
+
+          <!-- ═══ PETICIÓN: Clickeable ═══ -->
+          <g class="clickable" data-popup="peticion">
+            <rect x="340" y="112" width="140" height="40" rx="8" fill="rgba(6,182,212,0.12)" stroke="#06B6D4" stroke-width="1.5"/>
+            <text x="410" y="137" text-anchor="middle" font-size="13" font-weight="700" fill="#06B6D4">PETICIÓN</text>
+          </g>
+          <line x1="410" y1="152" x2="410" y2="162" stroke="#06B6D4" stroke-width="2" marker-end="url(#arrowCyan)"/>
+
+          <!-- Left: Lectura de inquietudes -->
+          <text x="140" y="248" text-anchor="start" font-size="9.5" fill="#8892AA" font-style="italic">Lectura de inquietudes /</text>
+          <text x="140" y="262" text-anchor="start" font-size="9.5" fill="#8892AA" font-style="italic">declaración de problema</text>
+          <line x1="193" y1="268" x2="218" y2="285" stroke="#5A6380" stroke-width="1" stroke-dasharray="3,3"/>
+
+          <!-- Right top: Negociación options -->
+          <g class="clickable" data-popup="negociacion">
+            <rect x="638" y="163" width="120" height="50" rx="6" fill="transparent" stroke="none"/>
+            <text x="645" y="175" text-anchor="start" font-size="10" fill="#8892AA">• Declinar</text>
+            <text x="645" y="190" text-anchor="start" font-size="10" fill="#8892AA">• Contra ofrecer</text>
+            <text x="645" y="205" text-anchor="start" font-size="10" fill="#8892AA">• Posponer</text>
+          </g>
+
+          <!-- ═══ PROMESA: Clickeable ═══ -->
+          <g class="clickable" data-popup="promesa">
+            <rect x="636" y="224" width="126" height="60" rx="8" fill="rgba(245,158,11,0.08)" stroke="rgba(245,158,11,0.35)" stroke-width="1.5"/>
+            <text x="699" y="244" text-anchor="middle" font-size="8.5" fill="#8892AA">+ Declaración de</text>
+            <text x="699" y="256" text-anchor="middle" font-size="8.5" fill="#8892AA">aceptación</text>
+            <text x="699" y="274" text-anchor="middle" font-size="12" font-weight="700" fill="#F59E0B">= PROMESA</text>
+          </g>
+          <line x1="636" y1="254" x2="608" y2="273" stroke="rgba(245,158,11,0.3)" stroke-width="1" stroke-dasharray="3,3"/>
+
+          <!-- ═══ DECLARACIÓN DE CUMPLIMIENTO: Clickeable ═══ -->
+          <g class="clickable" data-popup="cumplimiento">
+            <rect x="335" y="600" width="150" height="40" rx="8" fill="rgba(139,92,246,0.10)" stroke="rgba(139,92,246,0.35)" stroke-width="1.5"/>
+            <text x="410" y="616" text-anchor="middle" font-size="9" font-weight="600" fill="#8892AA">Declaración de</text>
+            <text x="410" y="631" text-anchor="middle" font-size="11.5" font-weight="700" fill="#8B5CF6">cumplimiento</text>
+          </g>
+
+          <!-- ═══ REVOCAR: Clickeable ═══ -->
+          <g class="clickable" data-popup="revocar">
+            <rect x="636" y="478" width="170" height="52" rx="6" fill="rgba(245,158,11,0.05)" stroke="rgba(245,158,11,0.2)" stroke-width="1"/>
+            <text x="645" y="494" text-anchor="start" font-size="10" font-weight="700" fill="#F59E0B">• Revocar (ejecutor)</text>
+            <text x="645" y="508" text-anchor="start" font-size="8.5" fill="#8892AA">No puedo cumplir → aviso de inmediato.</text>
+            <text x="645" y="521" text-anchor="start" font-size="8.5" fill="#8892AA">A tiempo, preserva la confianza.</text>
+          </g>
+
+          <!-- ═══ CANCELAR: Clickeable — Q3 ═══ -->
+          <g class="clickable" data-popup="cancelar">
+            <rect x="636" y="538" width="170" height="52" rx="6" fill="rgba(79,124,255,0.05)" stroke="rgba(79,124,255,0.2)" stroke-width="1"/>
+            <text x="645" y="554" text-anchor="start" font-size="10" font-weight="700" fill="#4F7CFF">• Cancelar (cliente)</text>
+            <text x="645" y="568" text-anchor="start" font-size="8.5" fill="#8892AA">Ya no lo necesito → aviso de inmediato.</text>
+            <text x="645" y="581" text-anchor="start" font-size="8.5" fill="#8892AA">A tiempo, evita trabajo innecesario.</text>
+          </g>
+
+          <!-- ═══ RECLAMAR: Clickeable ═══ -->
+          <g class="clickable" data-popup="reclamar">
+            <rect x="133" y="428" width="130" height="38" rx="6" fill="transparent" stroke="none"/>
+            <text x="140" y="445" text-anchor="start" font-size="10" fill="#4F7CFF">• Reclamar</text>
+            <text x="140" y="459" text-anchor="start" font-size="8" fill="#5A6380">(ante incumplimiento)</text>
+          </g>
+
+          <!-- ═══ DECLARACIÓN DE SATISFACCIÓN: Clickeable ═══ -->
+          <g class="clickable" data-popup="satisfaccion">
+            <rect x="128" y="510" width="100" height="46" rx="8" fill="rgba(16,185,129,0.08)" stroke="rgba(16,185,129,0.3)" stroke-width="1"/>
+            <text x="178" y="530" text-anchor="middle" font-size="9" font-weight="600" fill="#10B981">Declaración de</text>
+            <text x="178" y="543" text-anchor="middle" font-size="9" font-weight="700" fill="#10B981">satisfacción</text>
+          </g>
+          <line x1="205" y1="522" x2="225" y2="500" stroke="rgba(16,185,129,0.4)" stroke-width="1" stroke-dasharray="3,3"/>
+
+          <!-- Otros Ciclos — clickeable -->
+          <g class="clickable" data-popup="otros_ciclos">
+            <rect x="524" y="610" width="106" height="38" rx="8" fill="rgba(139,92,246,0.08)" stroke="rgba(139,92,246,0.3)" stroke-width="1.5"/>
+            <text x="577" y="626" text-anchor="middle" font-size="9" font-weight="700" fill="#8B5CF6">Otros Ciclos</text>
+            <text x="577" y="640" text-anchor="middle" font-size="8" fill="#8892AA">se abren aquí ▸</text>
+          </g>
+          <path d="M 512,598 Q 540,622 524,626" fill="none" stroke="rgba(139,92,246,0.4)" stroke-width="1" stroke-dasharray="3,3" marker-end="url(#arrowMuted)"/>
+
+          <!-- Caption -->
+          <text x="410" y="720" text-anchor="middle" font-size="11.5" fill="#8892AA" font-style="italic">Ciclo de coordinación de acciones</text>
+          <text x="410" y="762" text-anchor="middle" font-size="9.5" fill="#5A6380">Toca cada elemento para explorar · Basado en Echeverría — Newfield Consulting</text>
+        </svg>
+
+        <!-- ═══ POPUP OVERLAY ═══ -->
+        <div id="ciclo-popup" class="ciclo-popup" style="display:none;">
+          <button class="ciclo-popup-close" onclick="closeCicloPopup()">✕</button>
+          <div id="ciclo-popup-content"></div>
+        </div>
+
+        </div><!-- /ciclo-interactive -->
+      </div>
+
+      <style>
+        .ciclo-popup {
+          position: absolute; z-index: 20;
+          background: #1C1F2B; border: 1px solid rgba(6,182,212,0.35);
+          border-radius: 14px; padding: 22px 24px 20px;
+          max-width: 340px; width: 90%;
+          box-shadow: 0 12px 40px rgba(0,0,0,0.5), 0 0 20px rgba(6,182,212,0.08);
+          animation: popIn 0.18s ease-out;
+          font-family: 'DM Sans', sans-serif;
+        }
+        @keyframes popIn {
+          from { opacity: 0; transform: scale(0.92) translateY(6px); }
+          to   { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .ciclo-popup-close {
+          position: absolute; top: 10px; right: 14px;
+          background: none; border: none; color: #5A6380; font-size: 16px;
+          cursor: pointer; padding: 4px; line-height: 1;
+        }
+        .ciclo-popup-close:hover { color: #E8ECF5; }
+        .ciclo-popup h4 {
+          font-size: 14px; font-weight: 700; margin-bottom: 8px;
+          letter-spacing: 0.5px;
+        }
+        .ciclo-popup p {
+          font-size: 12.5px; color: #8892AA; line-height: 1.7; margin-bottom: 8px;
+        }
+        .ciclo-popup p:last-child { margin-bottom: 0; }
+        .ciclo-popup p strong { color: #E8ECF5; font-weight: 600; }
+        .ciclo-popup .popup-tag {
+          display: inline-block; font-size: 9px; font-weight: 700;
+          letter-spacing: 1.5px; text-transform: uppercase;
+          padding: 3px 8px; border-radius: 4px; margin-bottom: 10px;
+        }
+      </style>
+
+      <script>
+      (function(){
+        const popupData = {
+          cliente: {
+            color: '#4F7CFF',
+            html: '<span class="popup-tag" style="background:rgba(79,124,255,0.15); color:#4F7CFF;">ROL</span>' +
+              '<h4 style="color:#4F7CFF;">Cliente</h4>' +
+              '<p>Es <strong>quien detecta la necesidad o inquietud</strong> — quien identifica que algo falta y que no se resolverá si no hace una petición. Es el origen del ciclo.</p>' +
+              '<p>Sus responsabilidades: <strong>dar contexto</strong> antes de pedir, formular una petición clara con todos sus elementos, y al final del ciclo, <strong>confirmar si quedó satisfecho</strong> — eso es lo que cierra el ciclo.</p>' +
+              '<p>La calidad de lo que hace el ejecutor <strong>la define el cliente</strong>, no el ejecutor. El trabajo bien hecho es el que satisface a quien lo pidió.</p>'
+          },
+          ejecutor: {
+            color: '#F59E0B',
+            html: '<span class="popup-tag" style="background:rgba(245,158,11,0.15); color:#F59E0B;">ROL</span>' +
+              '<h4 style="color:#F59E0B;">Ejecutor</h4>' +
+              '<p>Es <strong>quien acepta la petición y se compromete</strong> a realizar la acción solicitada. Al aceptar, se hace responsable de la promesa.</p>' +
+              '<p>Antes de aceptar, debe <strong>eliminar toda ambigüedad</strong>: evaluar recursos (humanos, materiales, financieros), estimar plazos con rigor y verificar sus prioridades. Muchas promesas fallan por una inadecuada evaluación de estos factores.</p>' +
+              '<p>Si durante la realización descubre que no podrá cumplir, su obligación es <strong>revocar de inmediato</strong> — no esperar al vencimiento del plazo.</p>'
+          },
+          peticion: {
+            color: '#06B6D4',
+            html: '<span class="popup-tag" style="background:rgba(6,182,212,0.15); color:#06B6D4;">ACCIÓN DE APERTURA</span>' +
+              '<h4 style="color:#06B6D4;">Petición</h4>' +
+              '<p>Es la acción que <strong>abre el ciclo</strong>. Toda petición nace de una necesidad o inquietud: algo falta que no se resolverá solo.</p>' +
+              '<p>Una petición efectiva debe incluir cinco elementos: <strong>quién pide, a quién, qué acción concreta, en qué condiciones y para cuándo</strong>. Si falta alguno, el ciclo nace con una grieta.</p>' +
+              '<p>Pedimos porque esperamos que el otro diga "sí" y actúe. Ese "sí" explícito es lo que convierte la petición en una promesa.</p>'
+          },
+          promesa: {
+            color: '#F59E0B',
+            html: '<span class="popup-tag" style="background:rgba(245,158,11,0.15); color:#F59E0B;">MOMENTO CONSTITUTIVO</span>' +
+              '<h4 style="color:#F59E0B;">La promesa</h4>' +
+              '<p>La promesa se constituye cuando el ejecutor emite una <strong>declaración de aceptación</strong>. En ese momento hay una transformación importante de la realidad: el cliente puede comenzar a <strong>tomar acciones contando con ella</strong>.</p>' +
+              '<p>El activo de una persona no se limita a lo que posee — se extiende al <strong>conjunto de promesas que se le han hecho</strong>. Una promesa surte efectos mucho antes de cumplirse.</p>' +
+              '<p>Un "ok", un silencio o un "haré lo posible" <strong>no constituyen promesa</strong>. Solo una declaración explícita de aceptación lo hace.</p>'
+          },
+          centro: {
+            color: '#06B6D4',
+            html: '<span class="popup-tag" style="background:rgba(6,182,212,0.15); color:#06B6D4;">EL CORAZÓN DEL CICLO</span>' +
+              '<h4 style="color:#06B6D4;">Confianza y contexto compartido</h4>' +
+              '<p>En el centro del ciclo hay dos factores que <strong>atraviesan todas las fases</strong>: todo lo que se hace en el ciclo afecta — para bien o para mal — estos dos factores.</p>' +
+              '<p><strong>Confianza:</strong> no es una sola cosa. Se juega en tres dimensiones separables — sinceridad, competencia y responsabilidad. Es el indicador más importante de la calidad de una relación de trabajo.</p>' +
+              '<p><strong>Contexto compartido:</strong> es el espacio donde se conectan las necesidades e inquietudes de quien pide con las de quien ejecuta. No se trata solo de descubrirlo — la conversación también lo <strong>construye</strong>. Hablar bien crea terreno común donde antes no había.</p>'
+          },
+          reclamar: {
+            color: '#4F7CFF',
+            html: '<span class="popup-tag" style="background:rgba(79,124,255,0.15); color:#4F7CFF;">ACCIÓN DEL CLIENTE</span>' +
+              '<h4 style="color:#4F7CFF;">Reclamo</h4>' +
+              '<p>Es la conversación que <strong>cierra un ciclo que terminó en incumplimiento</strong>. A diferencia de la queja (que solo lanza juicios sin llegar a nada), el reclamo busca una reparación concreta.</p>' +
+              '<p>Sigue una estructura de 4 pasos: apertura neutra, descripción de hechos con espacio para escuchar, declaración del perjuicio, y <strong>petición de acciones reparadoras</strong>.</p>' +
+              '<p>Bien hecho, tiene el poder de <strong>disolver el resentimiento</strong>, dejar a ambas personas en una posición de dignidad y reparar la confianza.</p>'
+          },
+          revocar: {
+            color: '#F59E0B',
+            html: '<span class="popup-tag" style="background:rgba(245,158,11,0.15); color:#F59E0B;">ACCIÓN DEL EJECUTOR</span>' +
+              '<h4 style="color:#F59E0B;">Revocar</h4>' +
+              '<p>Cuando el ejecutor se da cuenta de que <strong>no podrá cumplir</strong> lo prometido — por cambio de prioridades, falta de recursos u otros imprevistos — debe avisarlo.</p>' +
+              '<p>La regla es simple: <strong>avisar lo antes posible</strong>. Esperar al último momento multiplica el costo para el cliente y daña más la confianza.</p>' +
+              '<p>Una revocación bien hecha — con explicación clara y disposición a compensar — puede incluso <strong>fortalecer la relación</strong>. Lo que destruye la confianza no es el imprevisto, sino el silencio.</p>'
+          },
+          cancelar: {
+            color: '#4F7CFF',
+            html: '<span class="popup-tag" style="background:rgba(79,124,255,0.15); color:#4F7CFF;">ACCIÓN DEL CLIENTE</span>' +
+              '<h4 style="color:#4F7CFF;">Cancelar</h4>' +
+              '<p>Cuando el cliente <strong>ya no necesita lo que pidió</strong> — porque la necesidad se resolvió de otra forma o las circunstancias cambiaron — debe cancelar la solicitud.</p>' +
+              '<p>La regla es la misma: <strong>avisar lo antes posible</strong>. Si el ejecutor ya está trabajando en ello, cada hora que pasa es tiempo y esfuerzo que se pierde.</p>' +
+              '<p>Cancelar a tiempo es una señal de respeto hacia quien ejecuta — y protege la confianza mutua.</p>'
+          },
+          otros_ciclos: {
+            color: '#8B5CF6',
+            html: '<span class="popup-tag" style="background:rgba(139,92,246,0.15); color:#8B5CF6;">CICLOS ANIDADOS</span>' +
+              '<h4 style="color:#8B5CF6;">Otros ciclos se abren aquí</h4>' +
+              '<p>Para cumplir un compromiso, muchas veces es necesario <strong>abrir nuevos ciclos con otras personas</strong>. Cada uno de esos ciclos tiene la misma estructura: petición, negociación, realización y evaluación.</p>' +
+              '<p>Ejemplo: el jefe de área le pide al coordinador de marketing publicitar un nuevo servicio. Para cumplir ese compromiso, el coordinador abre un nuevo ciclo con el diseñador, solicitándole los recursos gráficos necesarios.</p>' +
+              '<p><strong>El ciclo original no puede cerrarse bien si los ciclos internos no se gestionan bien.</strong> Por eso, quien asume un compromiso también es responsable de coordinar lo que necesita para cumplirlo.</p>'
+          },
+          cumplimiento: {
+            color: '#8B5CF6',
+            html: '<span class="popup-tag" style="background:rgba(139,92,246,0.15); color:#8B5CF6;">TRANSICIÓN DE FASE</span>' +
+              '<h4 style="color:#8B5CF6;">Declaración de cumplimiento</h4>' +
+              '<p>El ejecutor informa al cliente que <strong>la acción prometida ha sido realizada</strong>. Dos problemas frecuentes:</p>' +
+              '<p><strong>1.</strong> Se omite la declaración — el ejecutor asume que el cliente "ya sabe". Mientras tanto, el cliente puede seguir esperando.</p>' +
+              '<p><strong>2.</strong> Se confunde con el cierre del ciclo. La declaración de cumplimiento <strong>no cierra el ciclo</strong> — solo abre la fase de evaluación, donde el cliente juzgará si está satisfecho.</p>'
+          },
+          satisfaccion: {
+            color: '#10B981',
+            html: '<span class="popup-tag" style="background:rgba(16,185,129,0.15); color:#10B981;">CIERRE DEL CICLO</span>' +
+              '<h4 style="color:#10B981;">Declaración de satisfacción</h4>' +
+              '<p>Es la <strong>única acción que cierra el ciclo</strong>. El cliente examina si lo recibido cumple con las condiciones de satisfacción acordadas al hacer la promesa.</p>' +
+              '<p>Si hay insatisfacción, se abre un espacio de <strong>aprendizaje mutuo</strong>: el ejecutor aprende a mejorar su desempeño, y ambos aprenden a constituir mejores promesas.</p>' +
+              '<p>El más interesado en este juicio <strong>debería ser el ejecutor</strong>, no el cliente. Si el cliente no lo entrega, el ejecutor debería solicitarlo.</p>'
+          },
+          negociacion: {
+            color: '#8892AA',
+            html: '<span class="popup-tag" style="background:rgba(136,146,170,0.15); color:#8892AA;">ACCIONES DE NEGOCIACIÓN</span>' +
+              '<h4 style="color:#E8ECF5;">Declinar, contra ofrecer, posponer</h4>' +
+              '<p><strong>Declinar:</strong> decir "no". Protege la confianza y permite al otro buscar alternativas. Un "no" a tiempo es más valioso que un "sí" que se esfuma.</p>' +
+              '<p><strong>Contra ofrecer:</strong> proponer condiciones diferentes — en la acción, las condiciones de satisfacción o el plazo. Abre un proceso de negociación que busca llegar a un acuerdo.</p>' +
+              '<p><strong>Posponer:</strong> pedir tiempo para evaluar antes de responder. Es legítimo cuando faltan antecedentes para decidir.</p>'
+          }
+        };
+
+        let currentPopup = null;
+
+        document.querySelectorAll('.clickable').forEach(function(el){
+          el.addEventListener('click', function(e){
+            e.stopPropagation();
+            var key = el.getAttribute('data-popup');
+            if (currentPopup === key) { closeCicloPopup(); return; }
+            showCicloPopup(key, el);
+          });
+        });
+
+        document.addEventListener('click', function(e){
+          var popup = document.getElementById('ciclo-popup');
+          if (popup && popup.style.display !== 'none' && !popup.contains(e.target)) {
+            closeCicloPopup();
+          }
+        });
+
+        function showCicloPopup(key, svgEl) {
+          var data = popupData[key];
+          if (!data) return;
+          var popup = document.getElementById('ciclo-popup');
+          var content = document.getElementById('ciclo-popup-content');
+          content.innerHTML = data.html;
+          popup.style.borderColor = data.color + '55';
+          popup.style.display = 'block';
+
+          // Position relative to the SVG container
+          var container = document.querySelector('.ciclo-interactive');
+          var svg = container.querySelector('svg');
+          var containerRect = container.getBoundingClientRect();
+          var svgRect = svg.getBoundingClientRect();
+          var bbox = svgEl.getBoundingClientRect();
+
+          // Scale factor: SVG viewBox vs rendered size
+          var scaleX = svgRect.width / 820;
+
+          // Center of clicked element relative to container
+          var elCenterX = bbox.left + bbox.width/2 - containerRect.left;
+          var elTop = bbox.top - containerRect.top;
+          var elBottom = bbox.bottom - containerRect.top;
+
+          // Popup dimensions
+          var popupW = Math.min(340, containerRect.width * 0.9);
+          popup.style.width = popupW + 'px';
+
+          // Horizontal: center on element, clamp to edges
+          var left = elCenterX - popupW / 2;
+          left = Math.max(4, Math.min(left, containerRect.width - popupW - 4));
+          popup.style.left = left + 'px';
+
+          // Vertical: prefer below, fall back to above
+          var spaceBelow = containerRect.height - elBottom;
+          if (spaceBelow > 180) {
+            popup.style.top = (elBottom + 8) + 'px';
+            popup.style.bottom = 'auto';
+          } else {
+            popup.style.top = 'auto';
+            popup.style.bottom = (containerRect.height - elTop + 8) + 'px';
+          }
+
+          currentPopup = key;
+        }
+
+        window.closeCicloPopup = function() {
+          document.getElementById('ciclo-popup').style.display = 'none';
+          currentPopup = null;
+        };
+      })();
+      </script>
+
+      <!-- 4 fases expandidas -->
+      <div class="fases-grid">
+        <div class="fase-card">
+          <div class="ciclo-phase">Fase 1 · Creación de contexto</div>
+          <h4>Hacer una petición eficaz</h4>
+          <p>El ciclo nace cuando alguien detecta una <strong>necesidad o inquietud</strong>: algo falta y no se resolverá solo. Antes de pedir, vale la pena compartir el contexto propio y escuchar el del otro. Una petición eficaz <strong>muestra por qué conviene a ambos</strong> que se lleve a cabo — así llega como una posibilidad real, no como una carga.</p>
+        </div>
+        <div class="fase-card">
+          <div class="ciclo-phase">Fase 2 · Negociación</div>
+          <h4>Constituir la promesa</h4>
+          <p>El ejecutor puede <strong>aceptar, rechazar, proponer algo distinto o pedir tiempo para evaluar</strong>. Al decir "sí", nace la promesa. Antes de comprometerse, el ejecutor debe revisar honestamente si tiene los recursos, el tiempo y la disponibilidad real. Un "sí" sin esa evaluación es la causa más frecuente de los incumplimientos.</p>
+        </div>
+        <div class="fase-card">
+          <div class="ciclo-phase">Fase 3 · Realización</div>
+          <h4>Ejecutar y cumplir</h4>
+          <p>El ejecutor lleva a cabo lo comprometido. Si algo impide cumplir, lo correcto es <strong>avisar de inmediato</strong> — no esperar al último momento. El cliente puede <strong>cancelar</strong> si la necesidad original ya se resolvió de otra forma. La fase cierra cuando el ejecutor informa que terminó.</p>
+        </div>
+        <div class="fase-card">
+          <div class="ciclo-phase">Fase 4 · Evaluación y cierre</div>
+          <h4>El juicio que importa</h4>
+          <p>El ciclo <strong>no cierra cuando el ejecutor dice "listo"</strong> — cierra cuando el cliente evalúa y confirma que quedó bien. La calidad la define quien recibe el trabajo, no quien lo hace. Si hay insatisfacción, se convierte en una oportunidad para aprender a coordinar mejor.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. REVOCACIÓN Y CANCELACIÓN -->
+    <div class="section-block">
+      <span class="section-num">Cuando el ciclo se interrumpe</span>
+      <h2 class="section-title">Revocación y cancelación: dos acciones distintas</h2>
+      <p class="section-lead">No todo compromiso puede cumplirse siempre. Lo que define la seriedad con la que manejamos los compromisos no es no tener imprevistos — es <strong>cómo respondemos cuando aparecen</strong>. Hay dos acciones distintas según quién enfrenta el cambio.</p>
+
+      <div class="split-card">
+        <div class="split-side" style="background:rgba(245,158,11,0.04); border-right-color:var(--border);">
+          <span class="split-tag" style="background:rgba(245,158,11,0.12); color:var(--gold);">REVOCACIÓN · EL EJECUTOR</span>
+          <h4>Cuando no se puede cumplir</h4>
+          <p>El ejecutor descubre que las condiciones han cambiado: costos que se duplicaron, recursos que no están disponibles, plazos que colisionan. <strong>El ejecutor revoca su promesa</strong> y debe hacerlo de inmediato — mientras más cerca de la fecha de cumplimiento, mayor el costo en confianza.</p>
+          <p>La conversación de revocación debe incluir una <strong>explicación de los hechos</strong> y considerar formas de compensar al cliente por los perjuicios generados.</p>
+        </div>
+        <div class="split-side" style="background:rgba(79,124,255,0.04);">
+          <span class="split-tag" style="background:rgba(79,124,255,0.12); color:var(--accent);">CANCELACIÓN · EL CLIENTE</span>
+          <h4>Cuando ya no se necesita</h4>
+          <p>El cliente ya no necesita lo que pidió: la necesidad original se resolvió de otra forma, o la situación cambió. <strong>El cliente cancela</strong> la petición — y lo ideal es hacerlo de inmediato, antes de que el ejecutor invierta tiempo y recursos en algo que ya no sirve.</p>
+          <p>Mientras más rápido se efectúe la cancelación, <strong>menores serán los costos para el ejecutor</strong> y menor el impacto en la confianza mutua.</p>
+        </div>
+      </div>
+
+      <div class="info-box">
+        <strong>Responder bien ante los imprevistos no es señal de debilidad — es señal de seriedad.</strong> Una revocación o cancelación bien hecha — con explicación y haciéndose cargo del impacto — puede incluso <strong>fortalecer la confianza</strong>. Saber que el otro responde con responsabilidad cuando las cosas se complican es la base de una relación de trabajo sólida.
+      </div>
+    </div>
+
+    <hr class="hr" />
+
+    <!-- 4. QUEJA VS RECLAMO -->
+    <div class="section-block">
+      <span class="section-num">Ante el incumplimiento</span>
+      <h2 class="section-title">Queja y reclamo: dos caminos opuestos</h2>
+      <p class="section-lead">Cuando alguien no cumple con lo prometido, tenemos tres opciones: callar (que incuba resentimiento o indignidad), recriminar (que escala el conflicto sin resolver), o <strong>reclamar</strong> (que busca reparación y protege la relación).</p>
+
+      <div class="split-card">
+        <div class="split-side">
+          <span class="split-tag bad">RECRIMINACIÓN / QUEJA</span>
+          <h4>Lluvia de juicios sin acción</h4>
+          <p>Culpar al otro, emitir juicios sobre su carácter, escalar la emocionalidad. La conversación se caldea, ambos se sienten ofendidos, y <strong>no se genera ninguna acción reparadora</strong>.</p>
+          <p>Resultado: una conversación <strong>dañina y estéril</strong>. Su efecto en los equipos es destructivo.</p>
+        </div>
+        <div class="split-side">
+          <span class="split-tag good">RECLAMO</span>
+          <h4>De los juicios a la acción</h4>
+          <p>Nombrar lo que ocurrió (afirmaciones), señalar el perjuicio (juicio), y <strong>pedir acciones concretas de reparación</strong>. Cierra el ciclo que quedó abierto, disuelve el resentimiento y deja a ambas personas en una situación de dignidad.</p>
+          <p>Lo más importante: <strong>trasciende los juicios y se desplaza a la acción</strong> a través de peticiones finales.</p>
+        </div>
+      </div>
+
+      <div style="margin-top:28px;">
+        <h3 style="font-size:16px; font-weight:700; color:var(--text); margin-bottom:4px;">Estructura del reclamo efectivo</h3>
+        <p style="font-size:13px; color:var(--muted); margin-bottom:16px; line-height:1.7;">El reclamo es una conversación estructurada que combina hechos, reconocimiento del impacto y peticiones concretas. Cada paso incluye una pregunta para escuchar al otro antes de avanzar.</p>
+      </div>
+
+      <div class="reclamo-steps">
+        <div class="reclamo-step">
+          <span class="reclamo-step-num">PASO 1 · DECLARACIÓN DE APERTURA</span>
+          <div class="reclamo-frase">"Deseo hablar contigo para completar una conversación que mantengo abierta."</div>
+          <p>No se abre culpando ni anunciando un reclamo. Solo se señala que hay una conversación pendiente. <strong>Todavía no sabemos si hay motivo para reclamar</strong> — eso lo despejará la conversación.</p>
+        </div>
+        <div class="reclamo-step">
+          <span class="reclamo-step-num">PASO 2 · AFIRMACIONES + INDAGACIÓN</span>
+          <div class="reclamo-frase">"Tu prometiste hacer A en tiempo X. Según mi información, eso no se cumplió. ¿Estoy en lo correcto o ves las cosas de otra manera?"</div>
+          <p>Se establecen los hechos y se abre espacio para que el otro los confirme o los corrija. Es posible que descubramos un <strong>malentendido</strong> — una promesa mal hecha — y el reclamo se disuelva.</p>
+        </div>
+        <div class="reclamo-step">
+          <span class="reclamo-step-num">PASO 3 · DECLARACIÓN DEL PERJUICIO</span>
+          <div class="reclamo-frase">"Tu incumplimiento me ha perjudicado de esta manera... ¿Estás de acuerdo conmigo, o lo ves diferente?"</div>
+          <p>Se nombra el impacto concreto. Es posible que el otro, como <strong>observador diferente</strong>, tenga algo que aportar que modifique nuestra comprensión de lo ocurrido.</p>
+        </div>
+        <div class="reclamo-step">
+          <span class="reclamo-step-num">PASO 4 · PETICIONES DE REPARACIÓN</span>
+          <div class="reclamo-frase">"Por lo tanto, como una forma de hacerte cargo de tu responsabilidad, te pido que... ¿Ves tú acaso otras formas de hacerte cargo?"</div>
+          <p>Se pide <strong>compensación, acciones que se hagan cargo de las inquietudes insatisfechas, y/o protocolos</strong> para que no se repita en el futuro.</p>
+        </div>
+      </div>
+
+      <div class="warning-box" style="margin-top:20px;">
+        <span class="wicon">⚠️</span>
+        <p>El silencio ante el incumplimiento nos conduce a dos lugares malsanos: la <strong>indignidad</strong> (nos hacemos cómplices de la falta de respeto) o el <strong>resentimiento</strong> (alimentamos internamente el deseo de que el otro pague). Una organización que no permite el reclamo estará promoviendo el resentimiento de sus miembros.</p>
+      </div>
+    </div>
+
+    <hr class="hr" />
+
+    <!-- 5. LA CONFIANZA -->
+    <div class="section-block">
+      <span class="section-num">El corazón del ciclo</span>
+      <h2 class="section-title">La confianza y sus tres dominios</h2>
+      <p class="section-lead">La confianza está en el centro del ciclo. No es una sola cosa: cuando hacemos y recibimos compromisos, la confianza se juega en <strong>tres dimensiones distintas</strong> — y podemos evaluarlas por separado.</p>
+
+      <div class="confianza-grid">
+        <div class="conf-card">
+          <div class="conf-icon">🗣️</div>
+          <h4>Sinceridad</h4>
+          <p>Juzgamos que las <strong>conversaciones públicas son consistentes con las privadas</strong>. ¿Dice lo que piensa? ¿Promete lo que tiene intención de cumplir? La desconfianza aquí surge cuando estimamos que alguien se compromete a sabiendas de que no lo hará.</p>
+        </div>
+        <div class="conf-card">
+          <div class="conf-icon">🔧</div>
+          <h4>Competencia</h4>
+          <p>Juzgamos que la persona <strong>puede hacer aquello a lo que se compromete</strong>. Es importante distinguir dominios: puedo confiar en alguien en un ámbito y no en otro. Un buen técnico no necesariamente es un buen coordinador.</p>
+        </div>
+        <div class="conf-card">
+          <div class="conf-icon">🛡️</div>
+          <h4>Responsabilidad</h4>
+          <p>Juzgamos que la persona ha sido <strong>consistente en el cumplimiento de sus promesas en el tiempo</strong>. Hay personas sinceras y competentes que se extravían en la fase de realización: asumen otros compromisos, confunden prioridades y terminan por no cumplir.</p>
+        </div>
+      </div>
+
+      <div class="info-box">
+        Separar estas tres dimensiones nos ayuda a ser más precisos: <strong>no confiar en la capacidad de alguien para hacer algo no es lo mismo que dudar de su honestidad</strong>. Y permite actuar con más claridad: si el problema está en la competencia, la respuesta es aprendizaje; si está en el cumplimiento de compromisos, la respuesta son acuerdos de seguimiento.
+      </div>
+    </div>
+
+    <hr class="hr" />
+
+    <!-- 6. GESTIÓN DE PROMESAS -->
+    <div class="section-block">
+      <span class="section-num">La maestría</span>
+      <h2 class="section-title">Gestión de promesas: el arte de coordinar</h2>
+      <p class="section-lead">Gestionar bien los compromisos no significa nunca fallar — eso no es posible. Significa saber moverse con soltura en <strong>cada momento del ciclo</strong>: no solo cumplir, sino también saber decir que no con claridad, proponer alternativas, avisar a tiempo cuando algo cambia, y reclamar cuando corresponde.</p>
+
+      <div class="elem-stack">
+        <div class="elem-row">
+          <div class="elem-icon">🎯</div>
+          <div class="elem-body">
+            <h4>Hacer una petición eficaz</h4>
+            <p>No lanzar la petición sin más. Compartir el contexto propio, escuchar la situación del otro, <strong>mostrar por qué conviene a ambos</strong> que se lleve a cabo. Así la solicitud llega como una posibilidad — no como una interrupción.</p>
+          </div>
+        </div>
+        <div class="elem-row">
+          <div class="elem-icon">✅</div>
+          <div class="elem-body">
+            <h4>Pedir con todos los elementos</h4>
+            <p>Orador, oyente, acción concreta, condiciones de satisfacción y plazo. Cualquier pedido que salga sin estos elementos es una fuente de malentendido asegurada.</p>
+          </div>
+        </div>
+        <div class="elem-row">
+          <div class="elem-icon">🤝</div>
+          <div class="elem-body">
+            <h4>Aceptar con fundamento</h4>
+            <p>Antes de decir "sí", evaluar recursos, tiempo y prioridades. Un compromiso fundado en juicios rigurosos genera confianza. <strong>Un "sí" sin evaluación es una promesa débil.</strong></p>
+            <div class="miss">El "sí" que no se siente como "sí" es el origen de la mayoría de los incumplimientos silenciosos.</div>
+          </div>
+        </div>
+        <div class="elem-row">
+          <div class="elem-icon">⏰</div>
+          <div class="elem-body">
+            <h4>Avisar antes, no después</h4>
+            <p>Si algo impide cumplir, <strong>revocar de inmediato</strong>. La conversación debe incluir hechos, razones y formas de compensar. Mientras más se espera, mayor el costo en confianza.</p>
+          </div>
+        </div>
+        <div class="elem-row">
+          <div class="elem-icon">🔍</div>
+          <div class="elem-body">
+            <h4>Cerrar con declaración de satisfacción</h4>
+            <p>El ciclo se cierra cuando el cliente evalúa y declara satisfacción — no cuando el ejecutor dice "listo". <strong>Sin cierre explícito, el ciclo queda abierto</strong> y la ambigüedad corroe la coordinación.</p>
+          </div>
+        </div>
+        <div class="elem-row">
+          <div class="elem-icon">💬</div>
+          <div class="elem-body">
+            <h4>Reclamar, no recriminar</h4>
+            <p>Ante el incumplimiento, usar la estructura del reclamo: afirmaciones, perjuicio, peticiones de reparación. <strong>El reclamo cierra el ciclo y disuelve el resentimiento.</strong></p>
+          </div>
+        </div>
+        <div class="elem-row">
+          <div class="elem-icon">📊</div>
+          <div class="elem-body">
+            <h4>Dar seguimiento a las promesas de otros</h4>
+            <p>Gestionar promesas no es solo hacerlas bien — es también <strong>monitorear las que otros nos han hecho</strong>, fundar juicios de sinceridad, competencia y responsabilidad, y anticipar condiciones que podrían impedir su cumplimiento.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="quote-block">
+        <span class="qmark">"</span>
+        <p>El grado de impecabilidad que mostramos en la manera como prometemos y en el cumplimiento de nuestras promesas definirá nuestra identidad como trabajador, como gerente, pero también como amigo, como padre, como pareja, como miembro de una asociación civil.</p>
+        <div class="qauthor">— Rafael Echeverría, <em>El ciclo de la promesa</em>, Newfield Consulting</div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+
+</body>
+</html>

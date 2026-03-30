@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>El Ciclo de la Reflexión — Guía Práctica</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0F1117;
+      --surface:  #181B23;
+      --surface2: #1F2330;
+      --border:   #2A2F3E;
+      --accent:   #4F7CFF;
+      --accent2:  #7C3AED;
+      --gold:     #F59E0B;
+      --teal:     #14B8A6;
+      --text:     #E8ECF5;
+      --muted:    #8892AA;
+      --success:  #10B981;
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── NAV ── */
+    .topnav {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(15,17,23,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 32px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+    .back-btn:hover { color: var(--text); }
+    .back-btn svg { flex-shrink: 0; }
+    .topnav-sep { color: var(--border); font-size: 18px; }
+    .topnav-title { font-size: 13px; font-weight: 600; color: var(--text); }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 80px 32px 72px;
+      text-align: center;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 70% 60% at 50% 0%, rgba(79,124,255,0.12) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 40% at 20% 80%, rgba(124,58,237,0.08) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 18px;
+      border: 1px solid rgba(79,124,255,0.25);
+      border-radius: 20px;
+      padding: 5px 14px;
+      background: rgba(79,124,255,0.08);
+    }
+    .hero h1 {
+      font-size: clamp(30px, 5vw, 52px);
+      font-weight: 700;
+      line-height: 1.15;
+      margin-bottom: 12px;
+    }
+    .hero h1 em {
+      font-style: normal;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-sub {
+      font-size: 16px;
+      color: var(--muted);
+      margin-bottom: 32px;
+    }
+    .hero-author {
+      font-size: 12px;
+      color: var(--border);
+      letter-spacing: 1px;
+    }
+
+    /* ── PHASE STRIP ── */
+    .phase-strip {
+      max-width: 800px;
+      margin: 0 auto 80px;
+      padding: 0 32px;
+      display: flex;
+      align-items: center;
+      gap: 0;
+    }
+    .phase-node {
+      flex: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 16px;
+      text-align: center;
+      position: relative;
+    }
+    .phase-node:nth-child(1) { border-color: rgba(79,124,255,0.35); }
+    .phase-node:nth-child(3) { border-color: rgba(20,184,166,0.35); }
+    .phase-node:nth-child(5) { border-color: rgba(124,58,237,0.35); }
+    .phase-node .pn-icon { font-size: 20px; margin-bottom: 6px; }
+    .phase-node .pn-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .phase-arrow {
+      width: 32px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--border);
+      font-size: 18px;
+    }
+
+    /* ── CONTENT WRAPPER ── */
+    .content {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 0 32px 100px;
+    }
+
+    /* ── SECTION BLOCK ── */
+    .section-block {
+      margin-bottom: 72px;
+    }
+    .section-num {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      display: block;
+    }
+    .section-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 16px;
+      line-height: 1.3;
+    }
+    .section-lead {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.8;
+      max-width: 720px;
+    }
+    .section-lead strong { color: var(--text); font-weight: 500; }
+
+    /* ── INFO BOX ── */
+    .info-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: 10px;
+      padding: 20px 24px;
+      margin-top: 20px;
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.75;
+    }
+    .info-box strong { color: var(--text); font-weight: 500; }
+
+    /* ── TWO COL GRID ── */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 24px; }
+    @media (max-width: 620px) { .two-col { grid-template-columns: 1fr; } }
+
+    .col-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 22px;
+    }
+    .col-card .cc-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .col-card .cc-label.blue { color: var(--accent); }
+    .col-card .cc-label.teal { color: var(--teal); }
+    .col-card .cc-label.purple { color: var(--accent2); }
+    .col-card .cc-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+    .col-card p { font-size: 13.5px; color: var(--muted); line-height: 1.7; }
+    .col-card p strong { color: var(--text); font-weight: 500; }
+    .col-card ul { list-style: none; padding: 0; margin-top: 4px; }
+    .col-card ul li {
+      font-size: 13px;
+      color: var(--muted);
+      padding: 5px 0 5px 18px;
+      position: relative;
+      line-height: 1.6;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .col-card ul li:last-child { border-bottom: none; }
+    .col-card ul li::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      font-size: 11px;
+    }
+
+    /* ── THREE PHASES DETAIL ── */
+    .phases-detail { display: flex; flex-direction: column; gap: 16px; margin-top: 24px; }
+    .phase-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: 200px 1fr 1fr;
+    }
+    @media (max-width: 640px) {
+      .phase-card { grid-template-columns: 1fr; }
+    }
+    .phase-card-label {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      gap: 8px;
+      border-right: 1px solid var(--border);
+    }
+    .phase-card-label .ph-icon { font-size: 24px; }
+    .phase-card-label .ph-name {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+    .phase-card:nth-child(1) .phase-card-label { background: rgba(79,124,255,0.06); }
+    .phase-card:nth-child(1) .ph-name { color: var(--accent); }
+    .phase-card:nth-child(2) .phase-card-label { background: rgba(20,184,166,0.06); }
+    .phase-card:nth-child(2) .ph-name { color: var(--teal); }
+    .phase-card:nth-child(3) .phase-card-label { background: rgba(124,58,237,0.06); }
+    .phase-card:nth-child(3) .ph-name { color: var(--accent2); }
+
+    .phase-card-col {
+      padding: 20px 22px;
+      border-right: 1px solid var(--border);
+    }
+    .phase-card-col:last-child { border-right: none; }
+    .phase-card-col .pcc-q {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .phase-card-col .pcc-text {
+      font-size: 13.5px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+    .phase-card-col .pcc-text strong { color: var(--text); font-weight: 500; }
+
+    /* ── QUESTIONS GRID ── */
+    .questions-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 24px;
+    }
+    @media (max-width: 600px) { .questions-grid { grid-template-columns: 1fr; } }
+
+    .q-block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 22px;
+    }
+    .q-block .qb-title {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 14px;
+    }
+    .q-block ol {
+      list-style: none;
+      counter-reset: q-counter;
+      padding: 0;
+    }
+    .q-block ol li {
+      counter-increment: q-counter;
+      font-size: 13.5px;
+      color: var(--muted);
+      padding: 8px 0 8px 28px;
+      position: relative;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      line-height: 1.55;
+    }
+    .q-block ol li:last-child { border-bottom: none; }
+    .q-block ol li::before {
+      content: counter(q-counter);
+      position: absolute;
+      left: 0;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: rgba(79,124,255,0.12);
+      border: 1px solid rgba(79,124,255,0.2);
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      top: 9px;
+    }
+
+    /* ── HABIT STEPS ── */
+    .habit-steps {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-top: 24px;
+    }
+    @media (max-width: 640px) { .habit-steps { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 380px)  { .habit-steps { grid-template-columns: 1fr; } }
+
+    .habit-step {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 18px;
+      position: relative;
+    }
+    .hs-num {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 12px;
+    }
+    .hs-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .hs-text {
+      font-size: 12.5px;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    /* ── QUOTE ── */
+    .quote-section {
+      margin-top: 72px;
+      padding: 48px 40px;
+      background: linear-gradient(135deg, rgba(79,124,255,0.07), rgba(124,58,237,0.07));
+      border: 1px solid rgba(79,124,255,0.2);
+      border-radius: 16px;
+      text-align: center;
+    }
+    .quote-mark { font-size: 48px; line-height: 1; color: rgba(79,124,255,0.3); font-family: Georgia, serif; }
+    .quote-text {
+      font-size: clamp(16px, 2.5vw, 20px);
+      font-style: italic;
+      color: var(--text);
+      line-height: 1.7;
+      max-width: 680px;
+      margin: 12px auto 20px;
+      font-weight: 300;
+    }
+    .quote-author {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    /* ── HORIZONTAL RULE ── */
+    .hr { border: none; border-top: 1px solid var(--border); margin: 48px 0; }
+
+    /* ── PARÁBOLA ── */
+    .parabola-wrap {
+      margin: 64px 0;
+      border-left: 3px solid rgba(245,158,11,0.4);
+      padding: 4px 0 4px 28px;
+    }
+    .parabola-eyebrow {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 10px;
+      display: block;
+    }
+    .parabola-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 20px;
+      line-height: 1.35;
+    }
+    .parabola-p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.85;
+      margin-bottom: 14px;
+    }
+    .parabola-p strong { color: var(--text); font-weight: 500; }
+    .parabola-dialogue {
+      margin: 20px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .p-line {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.7;
+      padding-left: 16px;
+      border-left: 2px solid var(--border);
+    }
+    .p-line em { font-style: italic; }
+    .p-line .speaker {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 3px;
+    }
+    .p-line.vet .speaker { color: var(--teal); }
+    .p-line.len .speaker { color: var(--muted); }
+    .p-line strong { color: var(--text); font-weight: 500; }
+    .parabola-lesson {
+      margin-top: 22px;
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.8;
+      font-style: italic;
+    }
+    .parabola-lesson strong { color: var(--text); font-style: normal; font-weight: 500; }
+
+    /* ── BACK FOOTER ── */
+    .page-footer {
+      text-align: center;
+      padding: 0 32px 64px;
+    }
+    .back-link-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 24px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      text-decoration: none;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .back-link-btn:hover { border-color: var(--accent); color: var(--text); }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="topnav">
+    <a class="back-btn" href="coaching-cierre.html">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      Volver al programa
+    </a>
+    <span class="topnav-sep">/</span>
+    <span class="topnav-title">Ciclo de la Reflexión</span>
+  </nav>
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="hero-eyebrow">🔄 Distinción 04</div>
+    <h1>El Ciclo de la <em>Reflexión</em></h1>
+    <p class="hero-sub">Guía práctica para equipos</p>
+    <p class="hero-author">Rafael Echeverría &nbsp;·&nbsp; Newfield Consulting</p>
+  </header>
+
+  <!-- PHASE STRIP -->
+  <div class="phase-strip">
+    <div class="phase-node">
+      <div class="pn-icon">👁</div>
+      <div class="pn-label">Observar</div>
+    </div>
+    <div class="phase-arrow">→</div>
+    <div class="phase-node">
+      <div class="pn-icon">⚙️</div>
+      <div class="pn-label">Diseñar y Ejecutar</div>
+    </div>
+    <div class="phase-arrow">→</div>
+    <div class="phase-node">
+      <div class="pn-icon">📊</div>
+      <div class="pn-label">Evaluar y Mejorar</div>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- 01 QUÉ ES -->
+    <div class="section-block">
+      <span class="section-num">01</span>
+      <h2 class="section-title">¿Qué es el Ciclo de la Reflexión?</h2>
+      <p class="section-lead">
+        Herramienta práctica para <strong>aprender desde la propia experiencia</strong>. Su premisa: toda acción puede mejorarse si la observamos, evaluamos y rediseñamos conscientemente. Es la base del <strong>aprendizaje autónomo</strong> en equipos y organizaciones.
+      </p>
+      <div class="info-box">
+        <strong>¿Por qué importa en el trabajo de hoy?</strong><br>
+        El conocimiento adquirido se vuelve obsoleto con rapidez. La complejidad del entorno exige que los equipos aprendan desde su propia práctica, sin depender siempre de formación externa. <strong>Quien no reflexiona sobre su trabajo compromete los resultados de mañana.</strong>
+      </div>
+    </div>
+
+    <!-- 02 MODELO BASE -->
+    <div class="section-block">
+      <span class="section-num">02</span>
+      <h2 class="section-title">El Modelo Base: Observador — Acción — Resultados</h2>
+      <p class="section-lead">
+        Todo resultado es consecuencia de acciones. Toda acción depende del tipo de observador que somos. <strong>Cambiar resultados requiere actuar diferente; actuar diferente requiere observar diferente.</strong>
+      </p>
+      <div class="two-col" style="margin-top:24px">
+        <div class="col-card">
+          <div class="cc-label blue">Aprendizaje de 1er orden</div>
+          <div class="cc-title">Mejorar la acción</div>
+          <p>Mejora la acción <strong>sin cambiar la forma de observar</strong>. Ajustes técnicos, nuevos procedimientos, optimización de procesos.</p>
+        </div>
+        <div class="col-card">
+          <div class="cc-label purple">Aprendizaje de 2do orden</div>
+          <div class="cc-title">Transformar al observador</div>
+          <p>Modifica al observador mismo. <strong>Cuestionar supuestos, creencias y formas de interpretar</strong> la realidad que limitan el desempeño.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 03 LAS TRES FASES -->
+    <div class="section-block">
+      <span class="section-num">03</span>
+      <h2 class="section-title">Las Tres Fases del Ciclo</h2>
+      <p class="section-lead">
+        Tres momentos que se retroalimentan continuamente. La clave: sostenerlos como <strong>prácticas habituales del equipo</strong>, no como eventos aislados.
+      </p>
+      <div class="phases-detail">
+
+        <div class="phase-card">
+          <div class="phase-card-label">
+            <div class="ph-icon">✏️</div>
+            <div class="ph-name">Diseño</div>
+          </div>
+          <div class="phase-card-col">
+            <div class="pcc-q">¿Qué es?</div>
+            <p class="pcc-text"><strong>Reflexión antes de actuar.</strong> Se define qué se hará, cómo y con qué criterios de éxito.</p>
+          </div>
+          <div class="phase-card-col">
+            <div class="pcc-q">¿Cómo practicarla?</div>
+            <p class="pcc-text">Formular preguntas clave, anticipar obstáculos y <strong>establecer indicadores</strong> antes de ejecutar.</p>
+          </div>
+        </div>
+
+        <div class="phase-card">
+          <div class="phase-card-label">
+            <div class="ph-icon">⚡</div>
+            <div class="ph-name">Ejecución</div>
+          </div>
+          <div class="phase-card-col">
+            <div class="pcc-q">¿Qué es?</div>
+            <p class="pcc-text">La <strong>puesta en práctica del diseño</strong>. El momento de la acción directa.</p>
+          </div>
+          <div class="phase-card-col">
+            <div class="pcc-q">¿Cómo practicarla?</div>
+            <p class="pcc-text"><strong>Registrar lo que ocurre</strong> durante la ejecución para nutrir la evaluación posterior.</p>
+          </div>
+        </div>
+
+        <div class="phase-card">
+          <div class="phase-card-label">
+            <div class="ph-icon">🔍</div>
+            <div class="ph-name">Evaluación</div>
+          </div>
+          <div class="phase-card-col">
+            <div class="pcc-q">¿Qué es?</div>
+            <p class="pcc-text"><strong>Reflexión después de actuar.</strong> Se examina lo que ocurrió y por qué.</p>
+          </div>
+          <div class="phase-card-col">
+            <div class="pcc-q">¿Cómo practicarla?</div>
+            <p class="pcc-text">Identificar brechas, reconocer lo que funcionó y <strong>decidir qué cambiar</strong> en el próximo diseño.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 06 INDIVIDUAL VS EQUIPO -->
+    <div class="section-block">
+      <span class="section-num">06</span>
+      <h2 class="section-title">Reflexión Individual vs. Reflexión en Equipo</h2>
+      <p class="section-lead">
+        El trabajo reflexivo individual tiene valor, pero tiene límites: cada observador tiene <strong>zonas ciegas</strong> que no puede ver desde su propio sitial de observación. La reflexión en equipo amplía esas posibilidades.
+      </p>
+      <div class="two-col">
+        <div class="col-card">
+          <div class="cc-label teal">Individual</div>
+          <ul>
+            <li>Permite autoevaluación y diseño propio.</li>
+            <li>Está limitada por las zonas ciegas del observador.</li>
+            <li>Es un punto de partida, no un destino.</li>
+          </ul>
+        </div>
+        <div class="col-card">
+          <div class="cc-label blue">En Equipo</div>
+          <ul>
+            <li>Suma múltiples observadores y perspectivas.</li>
+            <li>Permite ver lo que uno no puede ver solo.</li>
+            <li>Requiere practicar el arte del feedback efectivo.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- 07 PREGUNTAS CLAVE -->
+    <div class="section-block">
+      <span class="section-num">07</span>
+      <h2 class="section-title">Preguntas Clave para tu Equipo</h2>
+      <p class="section-lead">
+        Usa estas preguntas como punto de partida para <strong>instalar el trabajo reflexivo</strong> en tu equipo:
+      </p>
+      <div class="questions-grid">
+        <div class="q-block">
+          <div class="qb-title">Sobre el diseño y la ejecución</div>
+          <ol>
+            <li>¿Qué queríamos lograr y por qué?</li>
+            <li>¿Estaban claras las condiciones de éxito antes de actuar?</li>
+            <li>¿Qué recursos y apoyos necesitábamos?</li>
+            <li>¿Cómo coordinamos la ejecución?</li>
+          </ol>
+        </div>
+        <div class="q-block">
+          <div class="qb-title">Sobre la evaluación y el aprendizaje</div>
+          <ol>
+            <li>¿Qué resultados obtuvimos vs. lo esperado?</li>
+            <li>¿Qué funcionó bien y debe conservarse?</li>
+            <li>¿Qué no funcionó y necesita cambiar?</li>
+            <li>¿Qué aprendimos sobre nosotros como equipo?</li>
+            <li>¿Cuánto tiempo dedicamos a reflexionar juntos?</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- 08 HÁBITO -->
+    <div class="section-block">
+      <span class="section-num">08</span>
+      <h2 class="section-title">Cómo Instalar el Hábito Reflexivo</h2>
+      <div class="habit-steps">
+        <div class="habit-step">
+          <div class="hs-num">1</div>
+          <div class="hs-title">Agenda tiempo</div>
+          <p class="hs-text">Reserva espacio fijo en reuniones solo para reflexionar, sin agenda operativa.</p>
+        </div>
+        <div class="habit-step">
+          <div class="hs-num">2</div>
+          <div class="hs-title">Diseña antes</div>
+          <p class="hs-text">Antes de cada proyecto: define criterios de éxito y anticipa obstáculos.</p>
+        </div>
+        <div class="habit-step">
+          <div class="hs-num">3</div>
+          <div class="hs-title">Evalúa siempre</div>
+          <p class="hs-text">Cierra cada ciclo: ¿qué funcionó, qué no, qué cambiamos?</p>
+        </div>
+        <div class="habit-step">
+          <div class="hs-num">4</div>
+          <div class="hs-title">Practica el feedback</div>
+          <p class="hs-text">El trabajo grupal requiere dar y recibir juicios con apertura y propósito.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- PARÁBOLA -->
+    <div class="parabola-wrap">
+      <span class="parabola-eyebrow">🪓 Parábola</span>
+      <h3 class="parabola-title">El Secreto del Leñador</h3>
+
+      <p class="parabola-p">Había una vez un leñador que se propuso ser el más eficiente de su equipo. El primer día taló 15 árboles. El segundo, con el mismo empeño, solo 10. El tercero, esforzándose hasta el agotamiento, apenas 5.</p>
+
+      <p class="parabola-p">Frustrado, se decía: <em>"No lo entiendo, cada vez me esfuerzo más, pero soy menos productivo."</em></p>
+
+      <div class="parabola-dialogue">
+        <div class="p-line vet">
+          <span class="speaker">Compañero veterano</span>
+          ¿Cuándo fue la última vez que te detuviste a <strong>afilar tu hacha</strong>?
+        </div>
+        <div class="p-line len">
+          <span class="speaker">El leñador</span>
+          ¿Afilar? No tengo tiempo para perderlo en eso… <strong>¡estoy demasiado ocupado talando árboles!</strong>
+        </div>
+      </div>
+
+      <p class="parabola-lesson"><strong>Afilar el hacha es el ciclo de la reflexión.</strong> No es tiempo perdido: es la condición para que el trabajo de mañana valga la pena.</p>
+    </div>
+
+    <!-- QUOTE -->
+    <div class="quote-section">
+      <div class="quote-mark">"</div>
+      <p class="quote-text">Quien no diseña un espacio para efectuar trabajo reflexivo, compromete hoy el trabajo de mañana.</p>
+      <div class="quote-author">Rafael Echeverría &nbsp;·&nbsp; Newfield Consulting</div>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div class="page-footer">
+    <a class="back-link-btn" href="coaching-cierre.html">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      Volver al programa de cierre
+    </a>
+  </div>
+
+</body>
+</html>

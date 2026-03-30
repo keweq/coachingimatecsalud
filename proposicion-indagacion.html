@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Proposición, Indagación y Escucha — Guía Práctica</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #0F1117;
+      --surface: #181B23;
+      --surface2:#1F2330;
+      --border:  #2A2F3E;
+      --accent:  #4F7CFF;
+      --accent2: #7C3AED;
+      --gold:    #F59E0B;
+      --teal:    #14B8A6;
+      --red:     #EF4444;
+      --green:   #10B981;
+      --text:    #E8ECF5;
+      --muted:   #8892AA;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    /* ── NAV ── */
+    .topnav {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(15,17,23,0.88); backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 32px; display: flex; align-items: center; gap: 12px;
+    }
+    .back-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 13px; font-weight: 500; color: var(--muted); text-decoration: none;
+      transition: color 0.15s;
+    }
+    .back-btn:hover { color: var(--text); }
+    .topnav-sep { color: var(--border); font-size: 18px; }
+    .topnav-title { font-size: 13px; font-weight: 600; color: var(--text); }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative; overflow: hidden;
+      padding: 80px 32px 68px; text-align: center;
+    }
+    .hero::before {
+      content: ''; position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 65% 55% at 50% 0%, rgba(20,184,166,0.11) 0%, transparent 65%),
+        radial-gradient(ellipse 40% 35% at 15% 90%, rgba(79,124,255,0.07) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 11px; font-weight: 600; letter-spacing: 2.5px;
+      text-transform: uppercase; color: var(--teal); margin-bottom: 18px;
+      border: 1px solid rgba(20,184,166,0.3); border-radius: 20px;
+      padding: 5px 14px; background: rgba(20,184,166,0.07);
+    }
+    .hero h1 { font-size: clamp(28px, 5vw, 50px); font-weight: 700; line-height: 1.15; margin-bottom: 10px; }
+    .hero h1 em {
+      font-style: normal;
+      background: linear-gradient(135deg, var(--teal), var(--accent));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .hero-sub { font-size: 15px; color: var(--muted); margin-bottom: 8px; }
+    .hero-author { font-size: 12px; color: var(--border); letter-spacing: 1px; }
+
+    /* ── CONTENT ── */
+    .content { max-width: 940px; margin: 0 auto; padding: 0 32px 100px; }
+
+    /* ── SECTION BLOCK ── */
+    .section-block { margin-bottom: 64px; }
+    .section-num { font-size: 11px; font-weight: 700; letter-spacing: 2px; color: var(--teal); text-transform: uppercase; margin-bottom: 8px; display: block; }
+    .section-title { font-size: 21px; font-weight: 700; color: var(--text); margin-bottom: 14px; line-height: 1.3; }
+    .section-lead { font-size: 15px; color: var(--muted); line-height: 1.8; max-width: 760px; }
+    .section-lead strong { color: var(--text); font-weight: 500; }
+    .section-lead em { font-style: italic; color: var(--text); }
+
+    /* ── SPLIT CARD ── */
+    .split-card {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 0; margin-top: 28px;
+      border: 1px solid var(--border); border-radius: 14px; overflow: hidden;
+    }
+    @media (max-width: 580px) { .split-card { grid-template-columns: 1fr; } }
+    .split-side { padding: 28px 26px; }
+    .split-side:first-child { border-right: 1px solid var(--border); background: rgba(79,124,255,0.04); }
+    .split-side:last-child { background: rgba(20,184,166,0.04); }
+    .split-tag { font-size: 10px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; border-radius: 5px; padding: 4px 10px; display: inline-block; margin-bottom: 14px; }
+    .split-tag.prop { background: rgba(79,124,255,0.12); color: var(--accent); }
+    .split-tag.indag { background: rgba(20,184,166,0.12); color: var(--teal); }
+    .split-tag.oir { background: rgba(139,92,246,0.12); color: #A78BFA; }
+    .split-tag.escuchar { background: rgba(20,184,166,0.12); color: var(--teal); }
+    .split-side h4 { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 10px; }
+    .split-side p { font-size: 13.5px; color: var(--muted); line-height: 1.75; }
+    .split-side p strong { color: var(--text); font-weight: 500; }
+
+    /* ── EVIDENCE CARDS ── */
+    .evidence-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 24px; }
+    @media (max-width: 560px) { .evidence-row { grid-template-columns: 1fr; } }
+    .evidence-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 22px; }
+    .ev-source { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+    .ev-finding { font-size: 13.5px; color: var(--muted); line-height: 1.75; }
+    .ev-finding strong { color: var(--text); font-weight: 500; }
+
+    /* ── QUOTE BLOCK ── */
+    .quote-block {
+      background: linear-gradient(135deg, rgba(20,184,166,0.07), rgba(79,124,255,0.05));
+      border: 1px solid rgba(20,184,166,0.2); border-radius: 14px;
+      padding: 32px 36px; margin-top: 28px;
+    }
+    .quote-block .qmark { font-size: 52px; line-height: 0.8; color: rgba(20,184,166,0.25); font-family: Georgia, serif; margin-bottom: 12px; display: block; }
+    .quote-block p { font-size: 16px; font-style: italic; color: var(--text); line-height: 1.75; font-weight: 300; max-width: 680px; }
+    .quote-block p strong { font-weight: 600; font-style: normal; color: var(--teal); }
+    .quote-author { margin-top: 14px; font-size: 12px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
+
+    /* ── INFO / WARNING BOXES ── */
+    .info-box {
+      background: var(--surface); border: 1px solid var(--border);
+      border-left: 3px solid var(--teal); border-radius: 10px;
+      padding: 20px 24px; margin-top: 20px; font-size: 14px; color: var(--muted); line-height: 1.75;
+    }
+    .info-box strong { color: var(--text); font-weight: 500; }
+    .info-box em { font-style: italic; color: var(--text); }
+
+    .warning-box {
+      background: rgba(245,158,11,0.06); border: 1px solid rgba(245,158,11,0.22);
+      border-radius: 10px; padding: 18px 22px; margin-top: 20px;
+      display: flex; gap: 14px; align-items: flex-start;
+    }
+    .warning-box .wicon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+    .warning-box p { font-size: 13.5px; color: var(--gold); line-height: 1.7; opacity: 0.9; }
+    .warning-box p strong { color: var(--gold); font-weight: 600; }
+
+    /* ── DIDACTIC FLOW (La proposición no es el enemigo) ── */
+    .flow-steps {
+      display: grid; grid-template-columns: 1fr auto 1fr auto 1fr;
+      gap: 0; align-items: stretch; margin-top: 28px;
+    }
+    @media (max-width: 680px) {
+      .flow-steps { grid-template-columns: 1fr; }
+      .flow-arrow { transform: rotate(90deg); margin: 4px auto; }
+    }
+    .flow-step {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 22px 20px;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .flow-step.bad  { border-top: 3px solid var(--red); }
+    .flow-step.mid  { border-top: 3px solid var(--gold); }
+    .flow-step.good { border-top: 3px solid var(--green); }
+
+    .flow-step-tag {
+      font-size: 9px; font-weight: 800; letter-spacing: 2px;
+      text-transform: uppercase; border-radius: 4px;
+      padding: 3px 8px; width: fit-content;
+    }
+    .flow-step.bad  .flow-step-tag { background: rgba(239,68,68,0.1); color: var(--red); }
+    .flow-step.mid  .flow-step-tag { background: rgba(245,158,11,0.1); color: var(--gold); }
+    .flow-step.good .flow-step-tag { background: rgba(16,185,129,0.1); color: var(--green); }
+
+    .flow-step h4 { font-size: 14px; font-weight: 600; color: var(--text); }
+    .flow-step p  { font-size: 13px; color: var(--muted); line-height: 1.65; }
+    .flow-step p strong { color: var(--text); font-weight: 500; }
+    .flow-step .flow-result {
+      margin-top: 6px; font-size: 12px; font-style: italic;
+      padding: 8px 12px; border-radius: 6px; line-height: 1.5;
+    }
+    .flow-step.bad  .flow-result { background: rgba(239,68,68,0.06); color: rgba(239,68,68,0.8); }
+    .flow-step.mid  .flow-result { background: rgba(245,158,11,0.06); color: rgba(245,158,11,0.8); }
+    .flow-step.good .flow-result { background: rgba(16,185,129,0.06); color: rgba(16,185,129,0.85); }
+
+    .flow-arrow {
+      display: flex; align-items: center; justify-content: center;
+      padding: 0 12px; color: var(--border); font-size: 20px; flex-shrink: 0;
+    }
+
+    .char-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 20px; }
+    @media (max-width: 560px) { .char-cards { grid-template-columns: 1fr; } }
+    .char-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px 22px; }
+    .char-card .cc-num { font-size: 28px; font-weight: 800; color: rgba(20,184,166,0.2); line-height: 1; margin-bottom: 6px; }
+    .char-card h4 { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+    .char-card p { font-size: 13px; color: var(--muted); line-height: 1.7; }
+    .char-card p strong { color: var(--text); font-weight: 500; }
+    .char-card .example {
+      margin-top: 10px; padding: 10px 13px; border-radius: 7px;
+      background: rgba(20,184,166,0.06); border: 1px solid rgba(20,184,166,0.12);
+      font-size: 12px; font-style: italic; color: var(--teal); line-height: 1.55;
+    }
+
+    /* ── SECTION DIVIDER ── */
+    .section-divider {
+      max-width: 940px; margin: 0 auto 56px; padding: 0 32px;
+      display: flex; align-items: center; gap: 16px;
+    }
+    .section-divider::before, .section-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    .section-divider-label {
+      font-size: 10px; font-weight: 800; letter-spacing: 3px;
+      text-transform: uppercase; color: var(--muted); white-space: nowrap;
+    }
+
+    /* ── RECONOCES / DIÁLOGOS ── */
+    .dialogue-compare {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 14px; margin-top: 24px;
+    }
+    @media (max-width: 600px) { .dialogue-compare { grid-template-columns: 1fr; } }
+    .dialogue-box {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden;
+    }
+    .dialogue-header {
+      padding: 10px 16px; display: flex; align-items: center; gap: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .dialogue-header .dh-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .dialogue-header .dh-label { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; }
+    .dialogue-box.bad .dh-dot { background: var(--red); }
+    .dialogue-box.bad .dh-label { color: var(--red); }
+    .dialogue-box.good .dh-dot { background: var(--green); }
+    .dialogue-box.good .dh-label { color: var(--green); }
+    .dialogue-body { padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+    .bubble {
+      padding: 9px 12px; border-radius: 8px; font-size: 12.5px; line-height: 1.55;
+      max-width: 90%;
+    }
+    .bubble.them { background: var(--surface2); color: var(--muted); align-self: flex-start; border-radius: 8px 8px 8px 2px; }
+    .bubble.me { background: rgba(79,124,255,0.12); color: var(--text); align-self: flex-end; border-radius: 8px 8px 2px 8px; }
+    .bubble.me.ask { background: rgba(20,184,166,0.1); color: var(--text); }
+    .bubble-speaker { font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--border); margin-bottom: 2px; }
+    .dialogue-verdict {
+      margin: 0 16px 14px; padding: 9px 12px; border-radius: 7px;
+      font-size: 12px; font-style: italic; line-height: 1.5;
+    }
+    .dialogue-box.bad .dialogue-verdict { background: rgba(239,68,68,0.07); color: rgba(239,68,68,0.8); }
+    .dialogue-box.good .dialogue-verdict { background: rgba(16,185,129,0.07); color: rgba(16,185,129,0.85); }
+
+    /* ── BALANCE VISUAL ── */
+    .balance-visual {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 22px 24px; margin-top: 24px;
+    }
+    .balance-row { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+    .balance-row:last-child { margin-bottom: 0; }
+    .balance-label { font-size: 12px; font-weight: 600; color: var(--muted); width: 160px; flex-shrink: 0; }
+    .balance-bar-wrap { flex: 1; height: 22px; background: var(--surface2); border-radius: 11px; overflow: hidden; position: relative; }
+    .balance-bar-fill { height: 100%; border-radius: 11px; display: flex; align-items: center; padding: 0 8px; font-size: 10px; font-weight: 700; color: white; letter-spacing: 0.5px; transition: width 0.3s; }
+    .balance-bar-fill.prop { background: rgba(79,124,255,0.7); }
+    .balance-bar-fill.indag { background: rgba(20,184,166,0.7); position: absolute; right: 0; top: 0; justify-content: flex-end; }
+    .balance-legend { display: flex; gap: 16px; margin-bottom: 16px; }
+    .bl-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); }
+    .bl-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .bl-dot.p { background: rgba(79,124,255,0.7); }
+    .bl-dot.i { background: rgba(20,184,166,0.7); }
+    .balance-caption { font-size: 12px; color: var(--muted); margin-top: 12px; font-style: italic; }
+    .balance-caption strong { color: var(--text); font-weight: 500; }
+
+    /* ── BEFORE / AFTER SCENARIO ── */
+    .scenario-box {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 12px; padding: 18px 22px; margin-top: 20px;
+    }
+    .scenario-situation {
+      font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 10px;
+    }
+    .scenario-text {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; padding: 12px 16px;
+      font-size: 13.5px; color: var(--text); line-height: 1.6;
+      font-style: italic; margin-bottom: 16px;
+    }
+    .scenario-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 600px) { .scenario-cols { grid-template-columns: 1fr; } }
+    .scenario-col { background: var(--surface); border: 1px solid var(--border); border-radius: 9px; overflow: hidden; }
+    .scenario-col-header {
+      padding: 9px 14px; font-size: 10px; font-weight: 700;
+      letter-spacing: 1.5px; text-transform: uppercase;
+      border-bottom: 1px solid var(--border);
+    }
+    .scenario-col.bad .scenario-col-header { background: rgba(239,68,68,0.06); color: var(--red); }
+    .scenario-col.good .scenario-col-header { background: rgba(16,185,129,0.06); color: var(--green); }
+    .scenario-col-body { padding: 12px 14px; display: flex; flex-direction: column; gap: 7px; }
+    .scenario-col-body .bubble { font-size: 12px; }
+    .scenario-outcome {
+      padding: 8px 14px 12px; font-size: 12px; font-style: italic;
+      border-top: 1px solid var(--border); line-height: 1.5;
+    }
+    .scenario-col.bad .scenario-outcome { color: rgba(239,68,68,0.75); }
+    .scenario-col.good .scenario-outcome { color: rgba(16,185,129,0.8); }
+
+    /* ── FRASES RECONOCIBLES ── */
+    .phrase-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+    .phrase-chip {
+      background: rgba(245,158,11,0.07); border: 1px solid rgba(245,158,11,0.2);
+      border-radius: 20px; padding: 7px 14px;
+      font-size: 12.5px; color: var(--gold); font-style: italic;
+      transition: background 0.15s;
+    }
+    .phrase-chip:hover { background: rgba(245,158,11,0.14); }
+
+    /* ── MICRO-PRÁCTICAS ── */
+    .micro-practices { display: flex; flex-direction: column; gap: 12px; margin-top: 24px; }
+    .micro-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; display: grid; grid-template-columns: 60px 1fr;
+      overflow: hidden;
+    }
+    .micro-num-col {
+      background: linear-gradient(135deg, rgba(20,184,166,0.1), rgba(79,124,255,0.08));
+      border-right: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; font-weight: 800; color: var(--teal);
+    }
+    .micro-body { padding: 18px 22px; }
+    .micro-when {
+      font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--teal); margin-bottom: 6px;
+    }
+    .micro-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+    .micro-action {
+      font-size: 13px; color: var(--muted); line-height: 1.7;
+    }
+    .micro-action strong { color: var(--text); font-weight: 500; }
+    .micro-tip {
+      margin-top: 10px; padding: 9px 13px; border-radius: 7px;
+      background: var(--surface2); border-left: 2px solid var(--teal);
+      font-size: 12px; font-style: italic; color: var(--muted); line-height: 1.5;
+    }
+
+    /* ── BRECHA ── */
+    .brecha-box {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 12px; padding: 24px 26px; margin-top: 24px;
+    }
+    .brecha-visual {
+      display: flex; align-items: center; gap: 0; margin-bottom: 20px;
+    }
+    .brecha-node {
+      flex: 1; background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; padding: 12px 14px; text-align: center;
+    }
+    .brecha-node .bn-label { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+    .brecha-node .bn-text { font-size: 12.5px; color: var(--text); font-weight: 500; }
+    .brecha-gap {
+      flex: 0 0 80px; text-align: center; position: relative;
+    }
+    .brecha-gap::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: var(--red); opacity: 0.4; }
+    .brecha-gap-label { font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--red); background: var(--surface2); position: relative; z-index: 1; padding: 0 6px; opacity: 0.8; }
+    .brecha-box p { font-size: 13.5px; color: var(--muted); line-height: 1.75; }
+    .brecha-box p strong { color: var(--text); font-weight: 500; }
+
+    /* ── TRES HERRAMIENTAS ── */
+    .tools-stack { display: flex; flex-direction: column; gap: 12px; margin-top: 24px; }
+    .tool-row {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; display: grid; grid-template-columns: 220px 1fr;
+      overflow: hidden;
+    }
+    @media (max-width: 560px) { .tool-row { grid-template-columns: 1fr; } }
+    .tool-row-label {
+      padding: 20px 22px; border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; justify-content: center; gap: 6px;
+    }
+    .tr-tag {
+      font-size: 9px; font-weight: 800; letter-spacing: 2px;
+      text-transform: uppercase; border-radius: 4px; padding: 3px 8px; width: fit-content;
+    }
+    .tr-tag.a { background: rgba(79,124,255,0.12); color: var(--accent); }
+    .tr-tag.b { background: rgba(20,184,166,0.12); color: var(--teal); }
+    .tr-tag.c { background: rgba(124,58,237,0.12); color: var(--accent2); }
+    .tool-row-label h4 { font-size: 14px; font-weight: 600; color: var(--text); }
+    .tool-row-body { padding: 20px 22px; }
+    .tool-row-body p { font-size: 13.5px; color: var(--muted); line-height: 1.75; margin-bottom: 10px; }
+    .tool-row-body p:last-child { margin-bottom: 0; }
+    .tool-row-body p strong { color: var(--text); font-weight: 500; }
+    .tool-row-body .phrase {
+      background: var(--surface2); border-radius: 7px; padding: 10px 14px;
+      font-size: 12.5px; font-style: italic; color: var(--teal);
+      border-left: 2px solid rgba(20,184,166,0.4); line-height: 1.5;
+    }
+
+    /* ── 4 NIVELES DE ESCUCHA ── */
+    .niveles-stack { display: flex; flex-direction: column; gap: 10px; margin-top: 24px; }
+    .nivel-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 11px; overflow: hidden;
+      display: grid; grid-template-columns: 80px 1fr;
+    }
+    @media (max-width: 520px) { .nivel-card { grid-template-columns: 1fr; } }
+    .nivel-num-col {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 20px 12px; border-right: 1px solid var(--border); gap: 4px;
+    }
+    .nivel-badge {
+      font-size: 22px; font-weight: 800; line-height: 1;
+    }
+    .nivel-badge.n1 { color: rgba(79,124,255,0.5); }
+    .nivel-badge.n2 { color: rgba(20,184,166,0.6); }
+    .nivel-badge.n3 { color: rgba(124,58,237,0.65); }
+    .nivel-badge.n4 { color: rgba(245,158,11,0.7); }
+    .nivel-depth { font-size: 8px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--border); text-align: center; }
+    .nivel-body { padding: 18px 22px; }
+    .nivel-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+    .nivel-desc { font-size: 13px; color: var(--muted); line-height: 1.7; }
+    .nivel-desc strong { color: var(--text); font-weight: 500; }
+    .nivel-cue {
+      display: inline-flex; align-items: center; gap: 6px;
+      margin-top: 10px; font-size: 12px; font-style: italic;
+      color: var(--muted); padding: 7px 12px;
+      background: var(--surface2); border-radius: 6px;
+    }
+    .nivel-cue::before { content: '→'; color: var(--teal); font-style: normal; font-size: 11px; }
+
+    /* ── APERTURA / CORRESPONSABILIDAD ── */
+    .apertura-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 24px; }
+    @media (max-width: 560px) { .apertura-grid { grid-template-columns: 1fr; } }
+    .ap-card { background: var(--surface); border: 1px solid var(--border); border-radius: 11px; padding: 22px; }
+    .ap-card .ap-icon { font-size: 22px; margin-bottom: 10px; }
+    .ap-card h4 { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+    .ap-card p { font-size: 13px; color: var(--muted); line-height: 1.7; }
+    .ap-card p strong { color: var(--text); font-weight: 500; }
+    .ap-card ul { list-style: none; padding: 0; margin-top: 10px; }
+    .ap-card ul li {
+      font-size: 13px; color: var(--muted); padding: 5px 0 5px 18px;
+      position: relative; border-bottom: 1px solid rgba(255,255,255,0.04); line-height: 1.55;
+    }
+    .ap-card ul li:last-child { border-bottom: none; }
+    .ap-card ul li::before { content: '·'; position: absolute; left: 5px; color: var(--teal); font-size: 16px; line-height: 1; }
+
+    /* ── SÍNTESIS TABLE ── */
+    .sintesis-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 13px; overflow: hidden; margin-top: 24px; }
+    .sintesis-table { width: 100%; border-collapse: collapse; }
+    .sintesis-table thead tr {
+      background: linear-gradient(90deg, rgba(20,184,166,0.09), rgba(79,124,255,0.06));
+      border-bottom: 1px solid var(--border);
+    }
+    .sintesis-table thead th { padding: 12px 18px; text-align: left; font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--teal); }
+    .sintesis-table tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
+    .sintesis-table tbody tr:last-child { border-bottom: none; }
+    .sintesis-table tbody tr:hover { background: rgba(20,184,166,0.03); }
+    .sintesis-table td { padding: 12px 18px; font-size: 13px; color: var(--muted); line-height: 1.6; vertical-align: top; }
+    .sintesis-table td:first-child { font-weight: 600; color: var(--text); white-space: nowrap; }
+    .sintesis-table td strong { color: var(--text); font-weight: 500; }
+
+    /* ── NO TODA PREGUNTA ── */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 20px; }
+    @media (max-width: 560px) { .two-col { grid-template-columns: 1fr; } }
+    .small-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; }
+    .sc-label { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 10px; }
+    .sc-label.red { color: var(--red); }
+    .sc-label.green { color: var(--green); }
+    .small-card ul { list-style: none; padding: 0; }
+    .small-card ul li {
+      font-size: 13px; color: var(--muted); padding: 5px 0 5px 18px;
+      position: relative; border-bottom: 1px solid rgba(255,255,255,0.04); line-height: 1.6;
+    }
+    .small-card ul li:last-child { border-bottom: none; }
+    .small-card ul li::before { content: '×'; position: absolute; left: 2px; font-size: 13px; font-weight: 700; color: var(--red); }
+    .small-card ul.ok li::before { content: '✓'; color: var(--green); font-size: 11px; top: 7px; }
+
+    /* ── PREGUNTAS / PRINCIPIOS ── */
+    .questions-stack { display: flex; flex-direction: column; gap: 12px; margin-top: 24px; }
+    .q-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px 22px; display: flex; gap: 16px; align-items: flex-start; }
+    .q-num {
+      width: 30px; height: 30px; border-radius: 8px; flex-shrink: 0;
+      background: rgba(20,184,166,0.1); border: 1px solid rgba(20,184,166,0.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; color: var(--teal);
+    }
+    .q-card-body h4 { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+    .q-card-body p { font-size: 13px; color: var(--muted); line-height: 1.7; }
+    .q-card-body p strong { color: var(--text); font-weight: 500; }
+
+    .principles-list { display: flex; flex-direction: column; gap: 10px; margin-top: 24px; }
+    .principle { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 18px 22px; display: flex; gap: 14px; align-items: flex-start; }
+    .p-num { font-size: 11px; font-weight: 800; letter-spacing: 1px; color: var(--teal); flex-shrink: 0; margin-top: 2px; width: 20px; }
+    .p-text { font-size: 13.5px; color: var(--muted); line-height: 1.7; }
+    .p-text strong { color: var(--text); font-weight: 500; }
+
+    /* ── HR ── */
+    .hr { border: none; border-top: 1px solid var(--border); margin: 52px 0; }
+
+    /* ── FOOTER ── */
+    .page-footer { text-align: center; padding: 0 32px 64px; }
+    .back-link-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 12px 24px; font-size: 13px; font-weight: 500;
+      color: var(--muted); text-decoration: none; transition: border-color 0.15s, color 0.15s;
+    }
+    .back-link-btn:hover { border-color: var(--teal); color: var(--text); }
+  </style>
+</head>
+<body>
+
+  <nav class="topnav">
+    <a class="back-btn" href="coaching-cierre.html">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      Volver al programa
+    </a>
+    <span class="topnav-sep">/</span>
+    <span class="topnav-title">Proposición, Indagación y Escucha</span>
+  </nav>
+
+  <header class="hero">
+    <div class="hero-eyebrow">🔍 Distinción 02</div>
+    <h1>Proposición, Indagación<br>y <em>Escucha</em></h1>
+    <p class="hero-sub">Las competencias conversacionales que definen cómo piensan y aprenden los equipos</p>
+    <p class="hero-author">Rafael Echeverría &nbsp;·&nbsp; Newfield Consulting, 2005</p>
+  </header>
+
+  <div class="content">
+
+    <!-- ════ PARTE 1: PROPONER E INDAGAR ════ -->
+
+    <!-- 1. LA DISTINCIÓN -->
+    <div class="section-block">
+      <span class="section-num">La distinción fundamental</span>
+      <h2 class="section-title">Dos formas de hablar — y solo dos</h2>
+      <p class="section-lead">
+        Todo hablar se divide en dos modalidades sin alternativa intermedia: <strong>proponer</strong> o <strong>indagar</strong>. Cuando hablamos, siempre hacemos una de las dos cosas. No hay una tercera opción.
+      </p>
+      <div class="split-card">
+        <div class="split-side">
+          <span class="split-tag prop">Proponer</span>
+          <h4>Hablar desde uno mismo</h4>
+          <p>Dar opiniones, sugerir soluciones, tomar posición, informar. Es un hablar <strong>auto-referido</strong>: revela cómo yo veo las cosas, pero no me acerca a cómo las ve el otro.</p>
+        </div>
+        <div class="split-side">
+          <span class="split-tag indag">Indagar</span>
+          <h4>Hablar al servicio del otro</h4>
+          <p>Preguntar para <strong>conocer genuinamente</strong> la perspectiva, el contexto y la experiencia del otro. Es hablar con el objetivo de escuchar, no de ser escuchado.</p>
+        </div>
+      </div>
+
+      <!-- ¿LO RECONOCES EN TU REUNIÓN? -->
+      <p class="section-lead" style="margin-top:28px">¿Lo reconoces en tus reuniones? La misma situación, dos enfoques completamente distintos:</p>
+      <div class="dialogue-compare">
+        <div class="dialogue-box bad">
+          <div class="dialogue-header">
+            <div class="dh-dot"></div>
+            <span class="dh-label">Solo proposición</span>
+          </div>
+          <div class="dialogue-body">
+            <div>
+              <div class="bubble-speaker">Colega</div>
+              <div class="bubble them">Los plazos del proyecto no se están cumpliendo.</div>
+            </div>
+            <div>
+              <div class="bubble-speaker">Tú</div>
+              <div class="bubble me">Hay que ser más organizados. Les mando un nuevo cronograma y vemos cómo distribuimos mejor las tareas.</div>
+            </div>
+            <div>
+              <div class="bubble them">…ok.</div>
+            </div>
+          </div>
+          <div class="dialogue-verdict">El problema real queda sin explorar. La solución puede no tener nada que ver con la causa.</div>
+        </div>
+        <div class="dialogue-box good">
+          <div class="dialogue-header">
+            <div class="dh-dot"></div>
+            <span class="dh-label">Indagación primero</span>
+          </div>
+          <div class="dialogue-body">
+            <div>
+              <div class="bubble-speaker">Colega</div>
+              <div class="bubble them">Los plazos del proyecto no se están cumpliendo.</div>
+            </div>
+            <div>
+              <div class="bubble-speaker">Tú</div>
+              <div class="bubble me ask">¿En qué etapa están ocurriendo los atrasos? ¿Qué lo está causando desde tu perspectiva?</div>
+            </div>
+            <div>
+              <div class="bubble them">La verdad, no tenemos claridad sobre quién decide qué cuando hay un conflicto de prioridades.</div>
+            </div>
+            <div>
+              <div class="bubble me ask">¿Puedes contarme un ejemplo concreto?</div>
+            </div>
+          </div>
+          <div class="dialogue-verdict">El problema real emerge: no es organización, es falta de claridad en roles de decisión.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. EVIDENCIA -->
+    <div class="section-block">
+      <span class="section-num">Lo que muestra la investigación</span>
+      <h2 class="section-title">El desequilibrio que frena a los equipos</h2>
+      <p class="section-lead">La mayoría de los equipos hablan <em>mucho más</em> de lo que preguntan. Eso no es un problema de personalidad: es un patrón cultural. Y tiene consecuencias directas en el desempeño.</p>
+
+      <div class="balance-visual">
+        <div class="balance-legend">
+          <div class="bl-item"><div class="bl-dot p"></div>Proposición</div>
+          <div class="bl-item"><div class="bl-dot i"></div>Indagación</div>
+        </div>
+        <div class="balance-row">
+          <div class="balance-label">Equipo típico</div>
+          <div class="balance-bar-wrap">
+            <div class="balance-bar-fill prop" style="width:82%">82%</div>
+            <div class="balance-bar-fill indag" style="width:18%">18%</div>
+          </div>
+        </div>
+        <div class="balance-row">
+          <div class="balance-label">Equipo alto desempeño</div>
+          <div class="balance-bar-wrap">
+            <div class="balance-bar-fill prop" style="width:52%">52%</div>
+            <div class="balance-bar-fill indag" style="width:48%">48%</div>
+          </div>
+        </div>
+        <p class="balance-caption">Según la investigación de Marcial Losada, <strong>el equilibrio entre proponer e indagar es el factor que genera conectividad</strong> en el equipo — y la conectividad es la clave del alto desempeño. Chris Argyris (Harvard) llega a la misma conclusión: la escasez de indagación compromete el desempeño global.</p>
+      </div>
+
+      <div class="evidence-row">
+        <div class="evidence-card">
+          <div class="ev-source">El problema de fondo</div>
+          <p class="ev-finding">En la mayoría de las reuniones, todos <strong>hablan para convencer</strong>, no para entender. El resultado: se acumulan posiciones, no se construye comprensión compartida.</p>
+        </div>
+        <div class="evidence-card">
+          <div class="ev-source">La buena noticia</div>
+          <p class="ev-finding">La indagación es una competencia que se <strong>entrena y contagia</strong>. Cuando algunos miembros del equipo empiezan a preguntar genuinamente, los demás tienden a abrirse también.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. EL MATIZ -->
+    <div class="section-block">
+      <span class="section-num">Un matiz importante</span>
+      <h2 class="section-title">La indagación no reemplaza la proposición — la mejora</h2>
+      <p class="section-lead">
+        Este punto es clave para no malinterpretar la herramienta. <strong>No se trata de dejar de proponer.</strong> Se trata de proponer mejor, y eso solo es posible si antes se indaga.
+      </p>
+
+      <div class="flow-steps">
+        <div class="flow-step bad">
+          <span class="flow-step-tag">Sin indagación</span>
+          <h4>Solo proponemos</h4>
+          <p>Hablamos desde nuestra perspectiva sin explorar la del otro. Las proposiciones son <strong>más superficiales</strong>: no accedemos a la información que solo emerge con preguntas.</p>
+          <div class="flow-result">Resolvemos el problema que suponemos, no el que existe.</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step mid">
+          <span class="flow-step-tag">Primero indagamos</span>
+          <h4>Exploramos antes de concluir</h4>
+          <p>Preguntamos con genuina apertura. <strong>Accedemos a dominios</strong> que sin preguntar nos serían imposibles de alcanzar.</p>
+          <div class="flow-result">Mayor comprensión, más información real disponible.</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step good">
+          <span class="flow-step-tag">Mejor proposición</span>
+          <h4>Proponemos desde lo que sabemos</h4>
+          <p>La propuesta resultante es <strong>más fundada, más relevante y más aceptada</strong> porque fue precedida por escucha real.</p>
+          <div class="flow-result">La propuesta resuelve el problema real, no el supuesto.</div>
+        </div>
+      </div>
+
+      <!-- ANTES / DESPUÉS CON ESCENARIO REAL -->
+      <div class="scenario-box">
+        <div class="scenario-situation">Misma situación — dos enfoques</div>
+        <div class="scenario-text">Un colega te informa: "Seguimos teniendo errores en el proceso de coordinación con la otra área."</div>
+        <div class="scenario-cols">
+          <div class="scenario-col bad">
+            <div class="scenario-col-header">Sin indagar primero</div>
+            <div class="scenario-col-body">
+              <div class="bubble me" style="font-size:12px">Hay que mejorar el protocolo. Les mando el documento actualizado esta tarde.</div>
+              <div class="bubble them" style="font-size:12px">…ok.</div>
+            </div>
+            <div class="scenario-outcome">El protocolo ya existía. El problema real era que nadie lo conocía. El error se repite.</div>
+          </div>
+          <div class="scenario-col good">
+            <div class="scenario-col-header">Indagando primero</div>
+            <div class="scenario-col-body">
+              <div class="bubble me ask" style="font-size:12px">¿En qué parte del proceso ocurren? ¿Desde cuándo?</div>
+              <div class="bubble them" style="font-size:12px">Cuando hay cambios de última hora, nadie sabe a quién avisarle primero.</div>
+              <div class="bubble me ask" style="font-size:12px">¿Tienen alguna idea de por qué ocurre eso?</div>
+            </div>
+            <div class="scenario-outcome">El problema real emerge: falta un responsable claro para cambios urgentes. La propuesta ahora apunta a eso.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LAS DOS CARACTERÍSTICAS -->
+      <p class="section-lead" style="margin-top:28px">Y cuando finalmente proponemos, hacerlo con estas dos características:</p>
+      <div class="char-cards">
+        <div class="char-card">
+          <div class="cc-num">01</div>
+          <h4>Proposición provisoria</h4>
+          <p>Toda proposición es siempre <strong>conjetural</strong>. Hacerla con consciencia de que podemos estar errados no es debilidad: es rigor intelectual.</p>
+          <div class="example">En vez de "esto es así", decir "desde mi perspectiva funciona así… ¿qué ven ustedes que yo puedo no estar viendo?"</div>
+        </div>
+        <div class="char-card">
+          <div class="cc-num">02</div>
+          <h4>Proposición poderosa</h4>
+          <p>Una propuesta precedida de indagación es <strong>más precisa y más difícil de rechazar</strong> porque habla directamente del problema real que el otro tiene.</p>
+          <div class="example">El especialista que pregunta antes de proponer soluciona lo que el cliente realmente necesita, no lo que pidió.</div>
+        </div>
+      </div>
+
+      <div class="quote-block">
+        <span class="qmark">"</span>
+        <p>Toda proposición es como un puerto, como tocar tierra firme. Pero una vez que lo hacemos, es importante reconocer que estamos a mitad de camino, que la tierra no es nunca tan firme como parece, y que pronto deberemos zarpar y volver al <strong>mar de la indagación</strong> a buscar nuevos puertos.</p>
+        <div class="quote-author">Rafael Echeverría &nbsp;·&nbsp; Newfield Consulting</div>
+      </div>
+    </div>
+
+    <!-- 4. TRAMPA DEL SENTIDO COMÚN -->
+    <div class="section-block">
+      <span class="section-num">El punto ciego del equipo</span>
+      <h2 class="section-title">La trampa del sentido común</h2>
+      <p class="section-lead">
+        El sentido común es el lugar donde <strong>dejamos de hacernos preguntas</strong>. No porque hayamos encontrado la verdad, sino porque dejamos de buscarla. En los equipos, esto se vuelve invisible porque todos comparten el mismo punto ciego.
+      </p>
+
+      <p class="section-lead" style="margin-top:16px; font-size:14px">¿Reconoces alguna de estas frases en tus reuniones?</p>
+      <div class="phrase-chips">
+        <span class="phrase-chip">"Siempre lo hemos hecho así."</span>
+        <span class="phrase-chip">"Es obvio que..."</span>
+        <span class="phrase-chip">"Todos sabemos que..."</span>
+        <span class="phrase-chip">"No hay tiempo para discutir eso."</span>
+        <span class="phrase-chip">"Eso ya lo probamos antes."</span>
+        <span class="phrase-chip">"Así funciona aquí."</span>
+        <span class="phrase-chip">"No vale la pena preguntar eso."</span>
+        <span class="phrase-chip">"Ese tema no se toca."</span>
+      </div>
+
+      <div class="info-box" style="margin-top:20px">
+        Cada una de esas frases es una señal de <strong>indagación detenida</strong>. Detrás de ellas hay respuestas que el equipo adoptó en algún momento —muchas veces sin decisión consciente— y que llevan años rigiendo sin que nadie las haya vuelto a cuestionar.
+      </div>
+
+      <div class="warning-box" style="margin-top:16px">
+        <span class="wicon">⚠️</span>
+        <p><strong>La pregunta que vale hacerse:</strong> ¿Cuáles son las respuestas que rigen este equipo y que nadie recuerda haber elegido? Si hoy tuviéramos que responder esas preguntas de nuevo, ¿responderíamos lo mismo?</p>
+      </div>
+    </div>
+
+    <!-- 5. PRACTICA ESTA SEMANA -->
+    <div class="section-block">
+      <span class="section-num">Para llevar a la práctica</span>
+      <h2 class="section-title">Tres micro-prácticas para esta semana</h2>
+      <p class="section-lead">No se necesita un taller ni un protocolo nuevo. Estas tres acciones son concretas, inmediatas y no requieren que nadie más cambie nada.</p>
+      <div class="micro-practices">
+
+        <div class="micro-card">
+          <div class="micro-num-col">1</div>
+          <div class="micro-body">
+            <div class="micro-when">En tu próxima reunión</div>
+            <div class="micro-title">Observa la proporción sin intervenir</div>
+            <p class="micro-action">Durante 15 minutos, cuenta mentalmente: cada vez que alguien propone, anota P. Cada vez que alguien pregunta genuinamente, anota I. Al final, mira la proporción. <strong>Solo observar ya cambia cómo participas.</strong></p>
+            <div class="micro-tip">No necesitas decirle nada a nadie. El simple acto de observar te vuelve más consciente de tus propios patrones.</div>
+          </div>
+        </div>
+
+        <div class="micro-card">
+          <div class="micro-num-col">2</div>
+          <div class="micro-body">
+            <div class="micro-when">Antes de tu próxima propuesta importante</div>
+            <div class="micro-title">Haz dos preguntas primero</div>
+            <p class="micro-action">Antes de dar tu opinión o tu solución, formula <strong>dos preguntas genuinas</strong> sobre la perspectiva del otro. No para quedar bien: para entender realmente. Luego propón.</p>
+            <div class="micro-tip">"¿Qué está ocurriendo desde tu perspectiva?" y "¿Qué lo está causando, en tu opinión?" son suficientes para cambiar completamente la calidad de lo que propongas después.</div>
+          </div>
+        </div>
+
+        <div class="micro-card">
+          <div class="micro-num-col">3</div>
+          <div class="micro-body">
+            <div class="micro-when">Cuando algo "sea obvio" en el equipo</div>
+            <div class="micro-title">Pregunta en voz alta por qué</div>
+            <p class="micro-action">La próxima vez que alguien diga "siempre lo hemos hecho así" o "es obvio que…", pregunta con genuina curiosidad: <strong>"¿Qué nos lleva a estar tan seguros de eso? ¿Cuándo fue la última vez que lo revisamos?"</strong></p>
+            <div class="micro-tip">No como confrontación — como apertura. La pregunta correcta no cuestiona a la persona, cuestiona el supuesto.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ════ SEPARADOR: ESCUCHA ════ -->
+    <div class="section-divider">
+      <span class="section-divider-label">La dimensión de la escucha</span>
+    </div>
+
+    <!-- 5. OÍR vs ESCUCHAR -->
+    <div class="section-block">
+      <span class="section-num">La distinción más ignorada</span>
+      <h2 class="section-title">Escuchar no es oír</h2>
+      <p class="section-lead">
+        Quien cree que escuchó lo que el otro dijo porque puede repetirlo, solo confirma que <em>oyó</em>. Pero eso nada dice de su escucha. <strong>La escucha es la competencia más importante en la comunicación humana</strong>, y sin embargo es la menos desarrollada.
+      </p>
+      <div class="split-card">
+        <div class="split-side">
+          <span class="split-tag oir">Oír</span>
+          <h4>Registrar palabras</h4>
+          <p>Es el acto físico de percibir sonidos. Una grabadora oye. No implica comprensión, ni interpretación, ni presencia real.</p>
+        </div>
+        <div class="split-side">
+          <span class="split-tag escuchar">Escuchar</span>
+          <h4>Percibir + interpretar</h4>
+          <p>Escuchar es darle <strong>sentido a lo que el otro dice desde la perspectiva del otro</strong>. Por eso los sordos pueden escuchar, y una grabadora no.</p>
+        </div>
+      </div>
+      <div class="info-box" style="margin-top:20px">
+        Además de las palabras, escuchamos con todos los sentidos: postura corporal, gestualidad, tono, ritmo. En reuniones virtuales o escritas, <strong>se pierde una parte enorme de la información disponible</strong>. Hay que compensar con más indagación explícita.
+      </div>
+    </div>
+
+    <!-- 6. LA BRECHA -->
+    <div class="section-block">
+      <span class="section-num">El problema que nadie ve</span>
+      <h2 class="section-title">La brecha inevitable</h2>
+      <p class="section-lead">
+        El sentido que el oyente le confiere a lo dicho por el orador <strong>nunca es igual</strong> al sentido que el propio orador le confiere a lo que dice. Siempre habrá una distancia.
+      </p>
+      <div class="brecha-box">
+        <div class="brecha-visual">
+          <div class="brecha-node">
+            <div class="bn-label">Lo que el orador quiso decir</div>
+            <div class="bn-text">"Lo que yo significo"</div>
+          </div>
+          <div class="brecha-gap">
+            <span class="brecha-gap-label">brecha</span>
+          </div>
+          <div class="brecha-node">
+            <div class="bn-label">Lo que el oyente interpretó</div>
+            <div class="bn-text">"Lo que yo entendí"</div>
+          </div>
+        </div>
+        <p>Toda relación está fundada en un sustrato inevitable de malentendidos. Esto no es una buena noticia. Pero es conveniente saberlo, porque una vez que reconocemos la brecha <strong>podemos hacernos responsables de ella</strong>.</p>
+        <p style="margin-top:12px">Antes de entender esto, podíamos decir "yo dije lo que dije, si el otro entendió otra cosa, ese es su problema." <strong>Eso ya no es sostenible.</strong> Sabiendo que la brecha existe, estamos obligados a hacernos cargo de ella.</p>
+      </div>
+    </div>
+
+    <!-- 7. TRES HERRAMIENTAS -->
+    <div class="section-block">
+      <span class="section-num">Cómo actuar</span>
+      <h2 class="section-title">Tres herramientas para reducir la brecha</h2>
+      <div class="tools-stack">
+
+        <div class="tool-row">
+          <div class="tool-row-label">
+            <span class="tr-tag a">Herramienta A</span>
+            <h4>Verificar escuchas</h4>
+          </div>
+          <div class="tool-row-body">
+            <p>No suponer que porque lo dije claramente, el otro lo interpretó como yo esperaba. La verificación es necesaria <strong>tanto para el orador como para el oyente</strong>.</p>
+            <p><strong>Como orador:</strong> pedirle al oyente que, en sus propias palabras, diga lo que entendió —no que repita las mías. Solo así accedo a su interpretación real.</p>
+            <p><strong>Como oyente:</strong> sospechar de la propia escucha. Que algo te haga sentido no significa que el sentido que le conferiste sea el correcto.</p>
+            <div class="phrase">"Espera un segundo. Déjame verificar si te entiendo bien. Entiendo que lo que me estás diciendo es…"</div>
+          </div>
+        </div>
+
+        <div class="tool-row">
+          <div class="tool-row-label">
+            <span class="tr-tag b">Herramienta B</span>
+            <h4>Compartir inquietudes</h4>
+          </div>
+          <div class="tool-row-body">
+            <p>Siempre que hablamos lo hacemos para hacernos cargo de algo que nos inquieta. Muchos problemas de escucha surgen de <strong>no saber cuál es la inquietud</strong> que conduce al orador a decir lo que dice.</p>
+            <p><strong>Como orador:</strong> compartir la inquietud antes de hacer la propuesta, antecediendo lo que se va a decir con un <em>"Dado que…"</em></p>
+            <p><strong>Como oyente:</strong> si el orador no compartió su inquietud, preguntar por ella antes de responder. Entender el por qué cambia completamente cómo se interpreta la propuesta.</p>
+            <div class="phrase">"Dado que hemos tenido tres errores en el proceso esta semana, propongo que…"</div>
+          </div>
+        </div>
+
+        <div class="tool-row">
+          <div class="tool-row-label">
+            <span class="tr-tag c">Herramienta C</span>
+            <h4>Indagar</h4>
+          </div>
+          <div class="tool-row-body">
+            <p>La indagación es la herramienta más poderosa para reducir la brecha. Cuando indagamos, <strong>hablamos para escuchar mejor</strong>: hablamos con el propósito de que el otro nos hable más.</p>
+            <p>Si la escucha no es segura: indagar. Si lo que el orador dijo es ambiguo: indagar. Si caben distintas interpretaciones: indagar. El objetivo siempre es reducir la brecha entre lo que se dijo y lo que se entendió.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 9. APERTURA Y CORRESPONSABILIDAD -->
+    <div class="section-block">
+      <span class="section-num">Lo más importante</span>
+      <h2 class="section-title">Apertura y corresponsabilidad</h2>
+      <p class="section-lead">
+        Escuchar al otro significa, en último término, <strong>abrirse a la posibilidad de que su palabra me transforme</strong>. Si el otro siente que no importa lo que diga, uno sigue siendo igual, ese otro sentirá inevitablemente que no lo escuchamos.
+      </p>
+      <div class="apertura-grid">
+        <div class="ap-card">
+          <div class="ap-icon">🌱</div>
+          <h4>La apertura requiere</h4>
+          <ul>
+            <li><strong>Humildad:</strong> sabernos limitados y precarios.</li>
+            <li><strong>Respeto:</strong> aceptar que el otro puede mostrarnos algo nuevo.</li>
+            <li>Entrar a las conversaciones dispuesto a <strong>cambiar de posición</strong>.</li>
+          </ul>
+          <p style="margin-top:12px; font-size: 12.5px; font-style:italic; color: var(--muted);">El límite necesario: esto no significa que todo deba transformarnos. La escucha madura implica discernimiento: saber qué permites que te cambie y qué eliges objetar.</p>
+        </div>
+        <div class="ap-card">
+          <div class="ap-icon">🔁</div>
+          <h4>La corresponsabilidad del orador</h4>
+          <p>La escucha del otro no es solo responsabilidad de él. <strong>El orador también es responsable</strong> de la escucha que genera. Si hablamos desde el respeto, si mostramos interés en escuchar, si la emocionalidad que irradiamos es positiva, la capacidad de escucha del oyente tenderá a expandirse.</p>
+          <ul style="margin-top:10px">
+            <li>Respeto en el tono</li>
+            <li>Indagación genuina</li>
+            <li>Confianza visible</li>
+            <li>Positividad emocional</li>
+          </ul>
+        </div>
+      </div>
+      <div class="info-box" style="margin-top:16px">
+        <strong>Para líderes:</strong> cada vez que entras a una conversación con la decisión ya tomada, cada vez que escuchas para confirmar lo que ya pensabas y no para ser afectado, estás ofreciéndole al equipo que hable contra una pared. Puede que oigas. Pero has comprometido tu capacidad de escucha.
+      </div>
+    </div>
+
+    <!-- SÍNTESIS ESCUCHA -->
+    <div class="section-block">
+      <span class="section-num">Síntesis</span>
+      <h2 class="section-title">Lo que un equipo necesita desarrollar</h2>
+      <div class="sintesis-wrap">
+        <table class="sintesis-table">
+          <thead>
+            <tr><th>Competencia</th><th>Qué implica en la práctica</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Verificar escuchas</td><td>Preguntar <strong>"¿qué entendiste?"</strong> antes de asumir que hubo acuerdo</td></tr>
+            <tr><td>Compartir inquietudes</td><td>Preceder las propuestas con el <strong>"Dado que…"</strong> que explica el por qué</td></tr>
+            <tr><td>Indagar</td><td>Preguntar antes de concluir; <strong>hablar para escuchar mejor</strong></td></tr>
+            <tr><td>Apertura a ser transformado</td><td>Entrar a las conversaciones <strong>dispuesto a cambiar de posición</strong></td></tr>
+            <tr><td>Corresponsabilidad</td><td>El orador también es <strong>responsable de la escucha que genera</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="warning-box" style="margin-top:16px">
+        <span class="wicon">💬</span>
+        <p>Cuando alguien en el equipo dice <em>"no me escuchan"</em>, la pregunta no es <em>"¿quién tiene razón?"</em>. La pregunta es: <strong>¿está esa persona pudiendo hacer diferencia con su palabra?</strong> Si la respuesta es no, hay un problema de escucha. Y ese problema siempre es compartido.</p>
+      </div>
+    </div>
+
+    <!-- 3 PREGUNTAS -->
+    <div class="section-block">
+      <span class="section-num">Para llevar al equipo</span>
+      <h2 class="section-title">Tres preguntas concretas</h2>
+      <div class="questions-stack">
+        <div class="q-card">
+          <div class="q-num">1</div>
+          <div class="q-card-body">
+            <h4>¿Cuánto indagamos en nuestras reuniones?</h4>
+            <p>Observa la proporción real entre cuánto tiempo se habla para proponer versus para preguntar. En la mayoría de los equipos, la proporción es <strong>abrumadoramente propositiva</strong>.</p>
+          </div>
+        </div>
+        <div class="q-card">
+          <div class="q-num">2</div>
+          <div class="q-card-body">
+            <h4>¿Nuestras proposiciones son provisorias o las defendemos como verdades?</h4>
+            <p>¿El equipo acepta revisar sus conclusiones, o las personas se aferran a sus posiciones? La <strong>rigidez propositiva</strong> es señal de baja cultura indagativa.</p>
+          </div>
+        </div>
+        <div class="q-card">
+          <div class="q-num">3</div>
+          <div class="q-card-body">
+            <h4>¿Cuáles son los límites de la indagación en este equipo?</h4>
+            <p>Hay temas que en muchos equipos simplemente <strong>"no se preguntan"</strong>. Identificarlos es el primer paso para expandir el espacio de conversación disponible.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5 PRINCIPIOS -->
+    <div class="section-block">
+      <span class="section-num">Síntesis final</span>
+      <h2 class="section-title">Los cinco principios que sostienen todo</h2>
+      <div class="principles-list">
+        <div class="principle">
+          <span class="p-num">01</span>
+          <p class="p-text"><strong>Proponer sin indagar produce conformidad, no pensamiento.</strong> La indagación previa es lo que hace rigurosas y poderosas a las proposiciones.</p>
+        </div>
+        <div class="principle">
+          <span class="p-num">02</span>
+          <p class="p-text"><strong>La escucha activa es una responsabilidad, no una espera.</strong> Indagar es hacerse cargo de que el otro pueda decir lo que todavía no ha dicho.</p>
+        </div>
+        <div class="principle">
+          <span class="p-num">03</span>
+          <p class="p-text"><strong>El sentido común del equipo es su mayor punto ciego.</strong> Las respuestas que nadie recuerda haber elegido son las que más necesitan ser cuestionadas.</p>
+        </div>
+        <div class="principle">
+          <span class="p-num">04</span>
+          <p class="p-text"><strong>Un equipo que no sabe escuchar es un equipo que no aprende.</strong> No porque le falte capacitación, sino porque no está dispuesto a dejarse afectar por lo que ocurre y por lo que los demás dicen.</p>
+        </div>
+        <div class="principle">
+          <span class="p-num">05</span>
+          <p class="p-text"><strong>La cultura indagativa se conquista, no se declara.</strong> Se construye conversación a conversación, cada vez que alguien elige preguntar en vez de concluir.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="page-footer">
+    <a class="back-link-btn" href="coaching-cierre.html">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      Volver al programa de cierre
+    </a>
+  </div>
+
+</body>
+</html>

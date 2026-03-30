@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Conversaciones Difíciles — Guía de Integración</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #0F1117;
+      --surface: #181B23;
+      --surface2:#1F2330;
+      --border:  #2A2F3E;
+      --accent:  #4F7CFF;
+      --accent2: #7C3AED;
+      --gold:    #F59E0B;
+      --red:     #EF4444;
+      --green:   #10B981;
+      --teal:    #14B8A6;
+      --orange:  #F97316;
+      --text:    #E8ECF5;
+      --muted:   #8892AA;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    /* ── NAV ── */
+    .topnav {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(15,17,23,0.88); backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 32px; display: flex; align-items: center; gap: 12px;
+    }
+    .back-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 13px; font-weight: 500; color: var(--muted); text-decoration: none;
+      transition: color 0.15s;
+    }
+    .back-btn:hover { color: var(--text); }
+    .topnav-sep { color: var(--border); font-size: 18px; }
+    .topnav-title { font-size: 13px; font-weight: 600; color: var(--text); }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative; overflow: hidden;
+      padding: 80px 32px 64px; text-align: center;
+    }
+    .hero::before {
+      content: ''; position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 65% 55% at 50% 0%, rgba(249,115,22,0.10) 0%, transparent 65%),
+        radial-gradient(ellipse 40% 35% at 85% 85%, rgba(79,124,255,0.06) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 11px; font-weight: 600; letter-spacing: 2.5px;
+      text-transform: uppercase; color: var(--orange); margin-bottom: 18px;
+      border: 1px solid rgba(249,115,22,0.3); border-radius: 20px;
+      padding: 5px 14px; background: rgba(249,115,22,0.07);
+    }
+    .hero h1 { font-size: clamp(26px, 4.5vw, 46px); font-weight: 700; line-height: 1.15; margin-bottom: 12px; }
+    .hero h1 em {
+      font-style: normal;
+      background: linear-gradient(135deg, var(--orange), #FB923C);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .hero-sub { font-size: 15px; color: var(--muted); max-width: 620px; margin: 0 auto; line-height: 1.7; }
+
+    /* ── CONTENT ── */
+    .content { max-width: 900px; margin: 0 auto; padding: 0 32px 100px; }
+
+    /* ── SECTION BLOCK ── */
+    .section-block { margin-bottom: 58px; }
+    .section-num { font-size: 11px; font-weight: 700; letter-spacing: 2px; color: var(--orange); text-transform: uppercase; margin-bottom: 8px; display: block; }
+    .section-title { font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 12px; line-height: 1.3; }
+    .section-lead { font-size: 14.5px; color: var(--muted); line-height: 1.8; max-width: 760px; }
+    .section-lead strong { color: var(--text); font-weight: 500; }
+
+    /* ── SPLIT CARD ── */
+    .split-card {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+      margin-top: 24px; border: 1px solid var(--border); border-radius: 14px; overflow: hidden;
+    }
+    @media (max-width: 580px) { .split-card { grid-template-columns: 1fr; } }
+    .split-side { padding: 26px; }
+    .split-side:first-child { border-right: 1px solid var(--border); background: rgba(239,68,68,0.04); }
+    .split-side:last-child { background: rgba(16,185,129,0.04); }
+    .split-tag { font-size: 10px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; border-radius: 5px; padding: 4px 10px; display: inline-block; margin-bottom: 12px; }
+    .split-tag.problema { background: rgba(239,68,68,0.12); color: var(--red); }
+    .split-tag.salida { background: rgba(16,185,129,0.12); color: var(--green); }
+    .split-side h4 { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+    .split-side p { font-size: 13px; color: var(--muted); line-height: 1.7; margin-bottom: 8px; }
+    .split-side p strong { color: var(--text); font-weight: 500; }
+    .example-chip {
+      background: var(--surface2); border: 1px solid var(--border); border-radius: 8px;
+      padding: 10px 14px; font-size: 12.5px; color: var(--muted); font-style: italic;
+      margin-top: 8px; line-height: 1.6;
+    }
+    .example-chip em { color: var(--text); font-style: normal; }
+
+    /* ── BEFORE / AFTER ROW ── */
+    .ba-row { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; margin-top: 20px; }
+    @media (max-width: 560px) { .ba-row { grid-template-columns: 1fr; } }
+    .ba-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+    .ba-label { font-size: 10px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; display: block; }
+    .ba-label.bad { color: var(--red); }
+    .ba-label.good { color: var(--green); }
+    .ba-text { font-size: 13.5px; color: var(--text); line-height: 1.7; font-style: italic; }
+    .ba-arrow { font-size: 22px; color: var(--muted); text-align: center; }
+
+    /* ── NUMBERED STACK ── */
+    .fundar-stack { margin-top: 22px; display: flex; flex-direction: column; gap: 10px; }
+    .fundar-row {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+      padding: 16px 20px; display: flex; align-items: flex-start; gap: 16px;
+    }
+    .fundar-num {
+      width: 30px; height: 30px; min-width: 30px; border-radius: 8px;
+      background: rgba(249,115,22,0.12); color: var(--orange);
+      font-size: 13px; font-weight: 800; display: flex; align-items: center; justify-content: center;
+    }
+    .fundar-body h4 { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .fundar-body p { font-size: 13px; color: var(--muted); line-height: 1.65; }
+    .fundar-body p strong { color: var(--text); font-weight: 500; }
+
+    /* ── MINI CARDS ROW ── */
+    .pillars-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 20px; }
+    @media (max-width: 560px) { .pillars-grid { grid-template-columns: 1fr; } }
+    .pillar-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+      padding: 20px 18px; text-align: center;
+    }
+    .pillar-icon { font-size: 24px; margin-bottom: 8px; }
+    .pillar-name { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+    .pillar-q { font-size: 12px; color: var(--muted); line-height: 1.6; font-style: italic; }
+
+    /* ── TWO-COL MINI ── */
+    .two-mini { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 18px; }
+    @media (max-width: 560px) { .two-mini { grid-template-columns: 1fr; } }
+    .mini-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+      padding: 20px;
+    }
+    .mini-tag { font-size: 10px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 8px; display: block; }
+    .mini-card h4 { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+    .mini-card p { font-size: 13px; color: var(--muted); line-height: 1.65; }
+    .mini-card p strong { color: var(--text); font-weight: 500; }
+
+    /* ── THREE-COL MINI ── */
+    .three-mini { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 18px; }
+    @media (max-width: 640px) { .three-mini { grid-template-columns: 1fr; } }
+
+    /* ── INFO / WARNING BOXES ── */
+    .info-box {
+      background: rgba(79,124,255,0.07); border: 1px solid rgba(79,124,255,0.2);
+      border-radius: 12px; padding: 18px 22px; margin-top: 16px;
+      font-size: 13.5px; color: var(--muted); line-height: 1.75;
+    }
+    .info-box strong { color: var(--text); font-weight: 600; }
+    .warning-box {
+      background: rgba(249,115,22,0.07); border: 1px solid rgba(249,115,22,0.22);
+      border-radius: 12px; padding: 16px 20px; margin-top: 16px;
+      font-size: 13.5px; color: var(--muted); line-height: 1.75;
+      display: flex; gap: 12px; align-items: flex-start;
+    }
+    .warning-box .wicon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+    .warning-box p strong { color: var(--text); font-weight: 500; }
+    .warning-box em { color: var(--orange); font-style: italic; }
+
+    /* ── DUAL COLUMNS (entregar/recibir style) ── */
+    .decalogo-wrap {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 24px;
+    }
+    @media (max-width: 640px) { .decalogo-wrap { grid-template-columns: 1fr; } }
+    .deca-col {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+      overflow: hidden;
+    }
+    .deca-header {
+      padding: 14px 20px; display: flex; align-items: center; gap: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .deca-header.tipo-a { background: rgba(249,115,22,0.07); }
+    .deca-header.tipo-b { background: rgba(20,184,166,0.07); }
+    .deca-header.tipo-c { background: rgba(79,124,255,0.07); }
+    .deca-icon { font-size: 18px; }
+    .deca-title { font-size: 13px; font-weight: 700; }
+    .deca-title.a { color: var(--orange); }
+    .deca-title.b { color: var(--teal); }
+    .deca-title.c { color: var(--accent); }
+    .deca-items { padding: 6px 0; }
+    .deca-item {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 11px 18px; border-bottom: 1px solid rgba(42,47,62,0.5);
+    }
+    .deca-item:last-child { border-bottom: none; }
+    .deca-dot {
+      width: 6px; height: 6px; min-width: 6px; border-radius: 50%;
+      margin-top: 7px;
+    }
+    .deca-dot.a { background: var(--orange); }
+    .deca-dot.b { background: var(--teal); }
+    .deca-dot.c { background: var(--accent); }
+    .deca-item-text { font-size: 13px; color: var(--muted); line-height: 1.6; }
+    .deca-item-text strong { color: var(--text); font-weight: 500; }
+    .deca-item-text em { color: var(--muted); font-style: italic; }
+
+    /* ── SCENARIO CARDS ── */
+    .scenario-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+      overflow: hidden; margin-top: 18px;
+    }
+    .scenario-header {
+      padding: 16px 22px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 12px;
+      background: rgba(249,115,22,0.04);
+    }
+    .scenario-num {
+      width: 28px; height: 28px; min-width: 28px; border-radius: 7px;
+      background: rgba(249,115,22,0.12); color: var(--orange);
+      font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center;
+    }
+    .scenario-title { font-size: 14px; font-weight: 700; color: var(--text); }
+    .scenario-body { padding: 20px 22px; }
+    .scenario-context { font-size: 13px; color: var(--muted); line-height: 1.7; margin-bottom: 14px; font-style: italic; }
+    .scenario-steps { display: flex; flex-direction: column; gap: 8px; }
+    .scenario-step {
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: 13px; color: var(--muted); line-height: 1.65;
+    }
+    .scenario-step .step-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+    .scenario-step strong { color: var(--text); font-weight: 500; }
+
+    /* ── FULL-WIDTH SINGLE COL ── */
+    .full-col {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+      overflow: hidden; margin-top: 18px;
+    }
+    .full-col .deca-header { background: rgba(249,115,22,0.05); }
+
+    /* ── QUOTE ── */
+    .quote-block {
+      border-left: 3px solid var(--orange);
+      padding: 16px 24px; margin-top: 20px;
+      background: rgba(249,115,22,0.04); border-radius: 0 10px 10px 0;
+    }
+    .quote-block p { font-size: 14px; color: var(--text); line-height: 1.7; font-style: italic; }
+    .quote-block .q-author { font-size: 12px; color: var(--muted); margin-top: 8px; font-style: normal; }
+
+    /* ── DIVIDER ── */
+    .hr { border: none; border-top: 1px solid var(--border); margin: 60px 0; }
+
+    /* ── CROSS-REF LINKS ── */
+    .cross-ref {
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(249,115,22,0.06); border: 1px solid rgba(249,115,22,0.25);
+      border-radius: 14px; padding: 16px 22px; text-decoration: none;
+      transition: background 0.15s, border-color 0.15s; margin-top: 10px;
+    }
+    .cross-ref:hover { background: rgba(249,115,22,0.10); border-color: rgba(249,115,22,0.45); }
+    .cross-ref-label { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--orange); margin-bottom: 3px; }
+    .cross-ref-title { font-size: 14px; font-weight: 600; color: var(--text); }
+    .cross-ref-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .cross-ref svg { flex-shrink: 0; margin-left: 16px; }
+  </style>
+</head>
+<body>
+
+  <nav class="topnav">
+    <a class="back-btn" href="coaching-cierre.html">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+      Volver
+    </a>
+    <span class="topnav-sep">/</span>
+    <span class="topnav-title">Conversaciones Difíciles</span>
+  </nav>
+
+  <div class="hero">
+    <div class="hero-eyebrow">Guía de integración</div>
+    <h1>Conversaciones <em>difíciles</em><br>en el equipo de trabajo</h1>
+    <p class="hero-sub">Cuando el problema real no es lo que pasó, sino la conversación que no hemos tenido. Esta guía integra las herramientas del programa para abordar los conflictos donde la vida laboral realmente se juega.</p>
+  </div>
+
+  <div class="content">
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- 1. POR QUÉ SON DIFÍCILES -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="section-block">
+      <span class="section-num">El punto de partida</span>
+      <h2 class="section-title">Por qué las evitamos</h2>
+      <p class="section-lead">
+        La mayoría de los conflictos laborales no escalan porque alguien hizo algo terrible. Escalan porque <strong>la conversación que podría haberlos resuelto nunca ocurrió</strong>. Lo que hace difícil una conversación no es su contenido —es lo que está en juego para nuestra identidad, para la relación, y para nuestras emociones.
+      </p>
+
+      <div class="pillars-grid" style="margin-top: 24px;">
+        <div class="pillar-card">
+          <div class="pillar-icon">🪞</div>
+          <div class="pillar-name">La identidad</div>
+          <p class="pillar-q">¿Y si al abrir esto descubro que yo también soy parte del problema?</p>
+        </div>
+        <div class="pillar-card">
+          <div class="pillar-icon">🤝</div>
+          <div class="pillar-name">La relación</div>
+          <p class="pillar-q">¿Y si al decir esto daño un vínculo que necesito para trabajar?</p>
+        </div>
+        <div class="pillar-card">
+          <div class="pillar-icon">🔥</div>
+          <div class="pillar-name">La emoción</div>
+          <p class="pillar-q">¿Y si no puedo controlar lo que siento y la conversación se desborda?</p>
+        </div>
+      </div>
+
+      <div class="warning-box">
+        <span class="wicon">⚠️</span>
+        <p>Estas tres amenazas son las que producen la evitación. Y la evitación tiene un costo: el conflicto no desaparece, se transforma en <strong>resentimiento, doble cara, desconfianza y baja coordinación</strong>. El precio de no conversar es siempre más alto que el precio de conversar mal.</p>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- 2. ANATOMÍA DEL CONFLICTO -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="section-block">
+      <span class="section-num">La distinción fundamental</span>
+      <h2 class="section-title">Toda conversación difícil tiene tres capas</h2>
+      <p class="section-lead">
+        Lo que parece un solo problema en realidad son tres conversaciones ocurriendo simultáneamente. Confundirlas es lo que hace que los intentos de resolución fracasen.
+      </p>
+
+      <div class="fundar-stack">
+        <div class="fundar-row">
+          <div class="fundar-num">1</div>
+          <div class="fundar-body">
+            <h4>La capa de los hechos — ¿Qué pasó?</h4>
+            <p>Aquí operan las <strong>afirmaciones y los juicios</strong>. El conflicto suele empezar porque cada parte tiene una versión distinta de lo que ocurrió. La herramienta: separar hechos observables de interpretaciones. ¿Es una afirmación verificable o es un juicio que estoy tratando como hecho?</p>
+          </div>
+        </div>
+        <div class="fundar-row">
+          <div class="fundar-num">2</div>
+          <div class="fundar-body">
+            <h4>La capa de las emociones — ¿Qué siento?</h4>
+            <p>Los sentimientos no son el ruido de la conversación: <strong>son la conversación</strong>. Cuando alguien dice "el problema es que no cumpliste el plazo", muchas veces el problema real es que se sintió no considerado, no respetado o no valorado. Sin abordar esta capa, la solución técnica no resuelve nada.</p>
+          </div>
+        </div>
+        <div class="fundar-row">
+          <div class="fundar-num">3</div>
+          <div class="fundar-body">
+            <h4>La capa de la identidad — ¿Qué dice esto de mí?</h4>
+            <p>La capa más profunda y la más difícil de ver. Cuando un conflicto nos desestabiliza más de lo esperado, suele ser porque <strong>pone en cuestión algo de nuestra imagen de nosotros mismos</strong>: ¿soy competente? ¿soy buena persona? ¿soy justo? Desde el coaching ontológico: el conflicto revela al observador que somos.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-box">
+        <strong>Las herramientas que ya conoces operan en cada capa:</strong> la distinción de afirmaciones y juicios opera en la capa 1. La escucha de nivel 3 (emocionalidad y corporalidad) opera en la capa 2. El ciclo de reflexión —observador, acción, resultado— opera en la capa 3. La conversación difícil es el lugar donde todo se integra.
+      </div>
+    </div>
+
+    <hr class="hr" />
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- 3. ANTES DE LA CONVERSACIÓN -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="section-block">
+      <span class="section-num">Preparación</span>
+      <h2 class="section-title">Antes de abrir la conversación</h2>
+      <p class="section-lead">
+        La conversación difícil no se gana en la conversación. Se gana —o se pierde— en la <strong>preparación interior</strong> que la precede. Estos son los pasos previos que cambian radicalmente el resultado.
+      </p>
+
+      <div class="fundar-stack">
+        <div class="fundar-row">
+          <div class="fundar-num">1</div>
+          <div class="fundar-body">
+            <h4>Separar hechos de juicios — por escrito</h4>
+            <p>Antes de hablar, escribe qué <strong>ocurrió</strong> (afirmaciones verificables) y qué <strong>interpretas</strong> (juicios). Esta operación, que ya conoces de la guía de retroalimentación, es lo primero. Si no puedes distinguir ambos por escrito, menos podrás hacerlo en el calor de la conversación.</p>
+          </div>
+        </div>
+        <div class="fundar-row">
+          <div class="fundar-num">2</div>
+          <div class="fundar-body">
+            <h4>Identificar tu inquietud real</h4>
+            <p>¿Qué es lo que realmente te inquieta? No lo que te molesta en la superficie, sino <strong>la inquietud de fondo</strong>. A veces lo que parece un reclamo por un plazo incumplido es en realidad una inquietud por no sentirse respetado, o por no confiar en que el equipo funciona. Nombrar la inquietud real cambia completamente lo que vas a decir.</p>
+          </div>
+        </div>
+        <div class="fundar-row">
+          <div class="fundar-num">3</div>
+          <div class="fundar-body">
+            <h4>Chequear tu emocionalidad</h4>
+            <p>¿Estás en condiciones de escuchar, o solo quieres descargar? Si la rabia o la frustración son dominantes, la conversación no será una conversación —será un monólogo con testigo. <strong>Posponer no es debilidad: es competencia.</strong> La regla: si no estás dispuesto a ser afectado por lo que el otro diga, no estás listo para conversar.</p>
+          </div>
+        </div>
+        <div class="fundar-row">
+          <div class="fundar-num">4</div>
+          <div class="fundar-body">
+            <h4>Preguntarte: ¿qué parte es mía?</h4>
+            <p>Esta es la pregunta más incómoda y la más transformadora. En el modelo observador-acción-resultado, si los resultados no son los que quiero, <strong>algo del observador que soy contribuye a producirlos</strong>. ¿Qué hice o dejé de hacer que permitió que esto llegara aquí? ¿Pedí lo que necesitaba? ¿Verifiqué que me escucharon?</p>
+          </div>
+        </div>
+        <div class="fundar-row">
+          <div class="fundar-num">5</div>
+          <div class="fundar-body">
+            <h4>Definir tu propósito — el "para qué"</h4>
+            <p>¿Para qué quieres tener esta conversación? Si el propósito es <strong>demostrar que tienes razón</strong>, no abras la conversación. Si el propósito es <strong>resolver algo que afecta el trabajo y la relación</strong>, entonces tienes un "para qué" que puede sostener la conversación incluso cuando se ponga difícil.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- 4. LA ESTRUCTURA DE LA CONVERSACIÓN -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="section-block">
+      <span class="section-num">La estructura</span>
+      <h2 class="section-title">Cinco movimientos para la conversación</h2>
+      <p class="section-lead">
+        No hay un guion perfecto. Pero hay una estructura que aumenta las probabilidades de que la conversación <strong>abra posibilidades en vez de cerrarlas</strong>. Cada movimiento usa herramientas que ya trabajamos en el programa.
+      </p>
+
+      <div class="fundar-stack">
+        <div class="fundar-row">
+          <div class="fundar-num">1</div>
+          <div class="fundar-body">
+            <h4>Abrir desde la inquietud compartida, no desde la culpa</h4>
+            <p>En vez de empezar con lo que el otro hizo mal, empezar con <strong>lo que a ambos les importa</strong>. El "dado que..." que ya conoces de la guía de escucha funciona aquí: <em>"Dado que ambos necesitamos que la coordinación entre nuestras áreas funcione, quiero conversar sobre algo que me preocupa."</em> Este movimiento le dice al otro que no vienes a atacar —vienes a resolver algo que les importa a los dos.</p>
+          </div>
+        </div>
+        <div class="fundar-row">
+          <div class="fundar-num">2</div>
+          <div class="fundar-body">
+            <h4>Describir lo que observas, no lo que el otro "es"</h4>
+            <p>Aquí entra directamente la distinción de juicios. En vez de <em>"tú eres irresponsable"</em> (etiqueta que cierra), describe <strong>las acciones concretas y su impacto</strong>: <em>"En las últimas tres semanas, los informes llegaron después del plazo acordado. Eso generó que yo no pudiera presentar a tiempo ante la dirección."</em> Hechos + impacto. Sin "siempre" ni "nunca".</p>
+          </div>
+        </div>
+        <div class="fundar-row">
+          <div class="fundar-num">3</div>
+          <div class="fundar-body">
+            <h4>Compartir cómo te afecta — la capa emocional</h4>
+            <p>Este es el movimiento que la mayoría omite por miedo a parecer vulnerable. Pero sin él, el otro no entiende por qué esto importa tanto. <em>"Cuando eso pasa, a mí me genera frustración porque siento que no puedo confiar en que los compromisos se van a cumplir."</em> <strong>Hablas de ti, no del otro.</strong> Primera persona, siempre. No es acusación: es transparencia.</p>
+          </div>
+        </div>
+        <div class="fundar-row">
+          <div class="fundar-num">4</div>
+          <div class="fundar-body">
+            <h4>Indagar — escuchar la versión del otro</h4>
+            <p>Este movimiento es el que convierte un reclamo en una conversación. <strong>Preguntar genuinamente:</strong> <em>"Me gustaría escuchar cómo lo ves tú"</em> o <em>"¿hay algo que yo no esté viendo?"</em>. Aquí se activa todo lo que trabajamos en indagación: preguntar para escuchar, no para confirmar lo que ya crees. Y lo más importante: estar dispuesto a que la respuesta cambie tu perspectiva.</p>
+          </div>
+        </div>
+        <div class="fundar-row">
+          <div class="fundar-num">5</div>
+          <div class="fundar-body">
+            <h4>Cerrar con compromiso concreto — la petición</h4>
+            <p>Toda conversación difícil que no termina en un compromiso claro fue un desahogo, no una resolución. Aquí entra la herramienta de <strong>peticiones efectivas</strong>: ¿qué acción concreta necesitas? ¿de quién? ¿para cuándo? ¿con qué condiciones de satisfacción? Y el otro tiene derecho a aceptar, negociar o declinar. Ese "no" posible es lo que hace real el "sí".</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="hr" />
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- 5. LOS CUATRO TIPOS DE CONVERSACIONES DIFÍCILES -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="section-block">
+      <span class="section-num">Los escenarios reales</span>
+      <h2 class="section-title">Cuatro conversaciones que todo equipo necesita saber tener</h2>
+      <p class="section-lead">
+        Cada tipo de conversación difícil activa herramientas distintas del programa. Lo que sigue es un mapa de <strong>qué herramienta usar en cada escenario</strong>.
+      </p>
+
+      <!-- ESCENARIO 1: EL RECLAMO -->
+      <div class="scenario-card">
+        <div class="scenario-header">
+          <div class="scenario-num">1</div>
+          <span class="scenario-title">El reclamo por un compromiso no cumplido</span>
+        </div>
+        <div class="scenario-body">
+          <p class="scenario-context">"Me comprometiste el informe para el viernes y hoy es martes de la semana siguiente. No avisaste, no renegociaste, y yo quedé sin material ante la dirección."</p>
+          <div class="scenario-steps">
+            <div class="scenario-step">
+              <span class="step-icon">🔧</span>
+              <p><strong>Herramienta principal:</strong> Ciclo de coordinación de acciones — conversación de reclamo (no reproche). Nombrar qué se acordó, qué no ocurrió y qué impacto tuvo.</p>
+            </div>
+            <div class="scenario-step">
+              <span class="step-icon">🔍</span>
+              <p><strong>Complemento:</strong> Indagar qué pasó antes de concluir. ¿Hubo un quiebre no comunicado? ¿El compromiso fue realmente un "sí" o fue un "haré lo posible"?</p>
+            </div>
+            <div class="scenario-step">
+              <span class="step-icon">🎯</span>
+              <p><strong>Cierre:</strong> Petición efectiva con todos sus elementos para el siguiente compromiso. Verificar que la declaración de aceptación sea clara.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ESCENARIO 2: EL FEEDBACK CRÍTICO -->
+      <div class="scenario-card">
+        <div class="scenario-header">
+          <div class="scenario-num">2</div>
+          <span class="scenario-title">El feedback sobre desempeño que nadie quiere dar</span>
+        </div>
+        <div class="scenario-body">
+          <p class="scenario-context">"Hace meses que observo un patrón y no he dicho nada. Cada vez que lo postergo, el problema crece y yo acumulo resentimiento."</p>
+          <div class="scenario-steps">
+            <div class="scenario-step">
+              <span class="step-icon">🔧</span>
+              <p><strong>Herramienta principal:</strong> Las cinco condiciones para fundar un juicio. Preparar el juicio con propósito, estándar, dominio, evidencia y test ácido antes de la conversación.</p>
+            </div>
+            <div class="scenario-step">
+              <span class="step-icon">🔍</span>
+              <p><strong>Complemento:</strong> Escucha de nivel 2 — ¿cuál es la inquietud del otro? Quizás el problema de desempeño tiene raíces que no ves: sobrecarga, falta de recursos, instrucciones contradictorias.</p>
+            </div>
+            <div class="scenario-step">
+              <span class="step-icon">🎯</span>
+              <p><strong>Cierre:</strong> Acción concreta + plazo de revisión. No dejar la conversación en "vamos a mejorar" — eso no es un compromiso.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ESCENARIO 3: LA TENSIÓN ENTRE ÁREAS -->
+      <div class="scenario-card">
+        <div class="scenario-header">
+          <div class="scenario-num">3</div>
+          <span class="scenario-title">La tensión crónica entre áreas o personas</span>
+        </div>
+        <div class="scenario-body">
+          <p class="scenario-context">"Cada vez que interactuamos con esa área, todo termina en fricción. Ya nadie quiere coordinar directamente con ellos."</p>
+          <div class="scenario-steps">
+            <div class="scenario-step">
+              <span class="step-icon">🔧</span>
+              <p><strong>Herramienta principal:</strong> Indagación ortogonal — ¿qué pieza falta? Cuando un conflicto es recurrente, la solución habitual (hablar más, reunirse más) no funciona. Hay que preguntar: ¿qué estamos no viendo?</p>
+            </div>
+            <div class="scenario-step">
+              <span class="step-icon">🔍</span>
+              <p><strong>Complemento:</strong> Indagación transversal — ¿este patrón aparece también en otros dominios? Si la fricción es solo con un área, el problema puede ser de coordinación. Si aparece en múltiples relaciones, el problema puede ser cultural o estructural.</p>
+            </div>
+            <div class="scenario-step">
+              <span class="step-icon">🎯</span>
+              <p><strong>Cierre:</strong> Diseño Estratégico de Identidad aplicado a la relación entre áreas: ¿qué juicios mutuos tenemos hoy? ¿Qué juicios queremos construir? ¿Qué acciones nuevas los producirían?</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ESCENARIO 4: LA CONVERSACIÓN CONSIGO MISMO -->
+      <div class="scenario-card">
+        <div class="scenario-header">
+          <div class="scenario-num">4</div>
+          <span class="scenario-title">La conversación que necesitas tener contigo mismo</span>
+        </div>
+        <div class="scenario-body">
+          <p class="scenario-context">"No es que no quiera dar el feedback. Es que tengo miedo de lo que va a pasar si lo doy. O de descubrir que el problema también soy yo."</p>
+          <div class="scenario-steps">
+            <div class="scenario-step">
+              <span class="step-icon">🔧</span>
+              <p><strong>Herramienta principal:</strong> Ciclo de reflexión — ¿qué observador estoy siendo frente a esta situación? ¿Qué juicios sobre mí mismo me están frenando? Los mismos juicios que bloquean el pedir (guía de peticiones) bloquean el conversar.</p>
+            </div>
+            <div class="scenario-step">
+              <span class="step-icon">🔍</span>
+              <p><strong>Complemento:</strong> Escucha de nivel 4 — "saber escuchar el bien". ¿Desde qué vulnerabilidad o miedo estoy reaccionando? ¿Desde qué vulnerabilidad está actuando el otro? Cuando esa pregunta se contesta honestamente, la conversación cambia antes de empezar.</p>
+            </div>
+            <div class="scenario-step">
+              <span class="step-icon">🎯</span>
+              <p><strong>Cierre:</strong> Declarar qué voy a hacer diferente y para cuándo. No como un plan perfecto, sino como una primera acción concreta.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="hr" />
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- 6. LOS ERRORES CLÁSICOS -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="section-block">
+      <span class="section-num">Lo que destruye la conversación</span>
+      <h2 class="section-title">Cinco errores que transforman un conflicto resoluble en uno crónico</h2>
+
+      <div class="split-card">
+        <div class="split-side">
+          <span class="split-tag problema">Lo que hacemos</span>
+          <h4>Los movimientos que cierran</h4>
+          <p><strong>Tratar juicios como hechos.</strong> "Tú eres irresponsable" en vez de describir conductas observables.</p>
+          <p><strong>Acumular y explotar.</strong> No decir nada durante semanas y después descargar todo junto, mezclando incidentes de distintas épocas.</p>
+          <p><strong>Triangular.</strong> Hablar del problema con todos menos con la persona involucrada.</p>
+          <p><strong>Buscar aliados.</strong> Entrar a la conversación con "todo el mundo piensa que tú..." en vez de hablar en primera persona.</p>
+          <p><strong>Conversar para ganar.</strong> Entrar con la conclusión ya tomada, usando la conversación solo para comunicar un veredicto.</p>
+        </div>
+        <div class="split-side">
+          <span class="split-tag salida">Lo que funciona</span>
+          <h4>Los movimientos que abren</h4>
+          <p><strong>Separar hechos de interpretaciones.</strong> Describir lo que pasó y acotar los juicios a su dominio.</p>
+          <p><strong>Conversar temprano.</strong> Abordar el quiebre cuando es pequeño, antes de que se convierta en resentimiento acumulado.</p>
+          <p><strong>Hablar directo.</strong> Con la persona que corresponde, en el momento adecuado, con el propósito claro.</p>
+          <p><strong>Hablar desde ti.</strong> "A mí me pasa que..." "Lo que yo observo es..." Primera persona, siempre.</p>
+          <p><strong>Conversar para entender.</strong> Entrar dispuesto a que la conversación cambie tu perspectiva. Si no estás dispuesto a eso, no es una conversación —es una sentencia.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- 7. LA EMOCIONALIDAD DEL CONFLICTO -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="section-block">
+      <span class="section-num">La capa que olvidamos</span>
+      <h2 class="section-title">Trabajar con la emocionalidad, no contra ella</h2>
+      <p class="section-lead">
+        Desde el coaching ontológico, las emociones no son obstáculos para la conversación —son <strong>información sobre lo que nos importa</strong>. Un conflicto sin emoción no es un conflicto: es un trámite. Lo que necesitamos no es eliminar la emoción, sino aprender a leerla y a comunicarla.
+      </p>
+
+      <div class="decalogo-wrap">
+        <div class="deca-col">
+          <div class="deca-header tipo-a">
+            <span class="deca-icon">🌡️</span>
+            <span class="deca-title a">Emociones que informan</span>
+          </div>
+          <div class="deca-items">
+            <div class="deca-item">
+              <div class="deca-dot a"></div>
+              <p class="deca-item-text"><strong>Frustración:</strong> algo que me importa no está ocurriendo. Indica una brecha entre expectativa y resultado. La pregunta: ¿hice la petición o solo tenía la expectativa?</p>
+            </div>
+            <div class="deca-item">
+              <div class="deca-dot a"></div>
+              <p class="deca-item-text"><strong>Rabia:</strong> percibo una injusticia o una falta de respeto. Tiene energía para actuar —pero si actúo desde ella sin procesarla, el daño puede ser mayor que el problema original.</p>
+            </div>
+            <div class="deca-item">
+              <div class="deca-dot a"></div>
+              <p class="deca-item-text"><strong>Miedo:</strong> algo que valoro está amenazado. Puede ser mi posición, mi reputación, la relación. El miedo es información sobre qué proteger, no necesariamente una razón para no actuar.</p>
+            </div>
+            <div class="deca-item">
+              <div class="deca-dot a"></div>
+              <p class="deca-item-text"><strong>Resentimiento:</strong> acumulé expectativas no comunicadas y ahora cargo con el peso de promesas que nunca pedí. Es la señal más clara de que una petición o un reclamo lleva demasiado tiempo pendiente.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="deca-col">
+          <div class="deca-header tipo-b">
+            <span class="deca-icon">🧭</span>
+            <span class="deca-title b">Qué hacer con ellas</span>
+          </div>
+          <div class="deca-items">
+            <div class="deca-item">
+              <div class="deca-dot b"></div>
+              <p class="deca-item-text"><strong>Nombrarlas.</strong> "Estoy frustrado" no es debilidad —es transparencia. Le da al otro la posibilidad de escucharte desde otro lugar.</p>
+            </div>
+            <div class="deca-item">
+              <div class="deca-dot b"></div>
+              <p class="deca-item-text"><strong>Distinguir emoción de juicio.</strong> "Estoy frustrado" es diferente de "eres frustrante". Lo primero habla de ti; lo segundo etiqueta al otro.</p>
+            </div>
+            <div class="deca-item">
+              <div class="deca-dot b"></div>
+              <p class="deca-item-text"><strong>Pedir tiempo si es necesario.</strong> "Necesito un momento antes de continuar" es un movimiento legítimo y protege la conversación.</p>
+            </div>
+            <div class="deca-item">
+              <div class="deca-dot b"></div>
+              <p class="deca-item-text"><strong>Escuchar la emoción del otro.</strong> Si el otro se activa emocionalmente, lo peor es ignorarlo. Lo que funciona: <em>"Veo que esto te afecta. ¿Quieres contarme más?"</em></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="quote-block">
+        <p>Detrás de cada persona que nos parece hostil hay una persona que se siente amenazada. La pregunta no es "¿por qué actúa así?" sino "¿desde qué vulnerabilidad actúa así?"</p>
+        <div class="q-author">— Escucha de nivel 4: saber escuchar el bien</div>
+      </div>
+    </div>
+
+    <hr class="hr" />
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- 8. EL MAPA DE HERRAMIENTAS -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="section-block">
+      <span class="section-num">El mapa integrado</span>
+      <h2 class="section-title">Qué herramienta del programa usar en cada momento</h2>
+      <p class="section-lead">
+        Cada herramienta que trabajamos en el programa tiene un punto exacto de activación en una conversación difícil. Este mapa te ayuda a reconocer <strong>cuándo usar cuál</strong>.
+      </p>
+
+      <div class="full-col">
+        <div class="deca-header tipo-a">
+          <span class="deca-icon">🗺️</span>
+          <span class="deca-title a">De la preparación al cierre</span>
+        </div>
+        <div class="deca-items">
+          <div class="deca-item">
+            <div class="deca-dot a"></div>
+            <p class="deca-item-text"><strong>Afirmaciones y juicios</strong> → para preparar la conversación: separar lo que pasó de lo que interpreto. Para fundarlo con las cinco condiciones antes de hablar.</p>
+          </div>
+          <div class="deca-item">
+            <div class="deca-dot a"></div>
+            <p class="deca-item-text"><strong>Escucha e inquietudes</strong> → para abrir: compartir mi inquietud con el "dado que..." y para escuchar la inquietud del otro antes de reaccionar.</p>
+          </div>
+          <div class="deca-item">
+            <div class="deca-dot a"></div>
+            <p class="deca-item-text"><strong>Indagación (horizontal → vertical → transversal)</strong> → para comprender: explorar el contexto, profundizar en lo que dice, buscar patrones más amplios.</p>
+          </div>
+          <div class="deca-item">
+            <div class="deca-dot a"></div>
+            <p class="deca-item-text"><strong>Indagación ortogonal</strong> → para desatascar: cuando la conversación gira en círculos, preguntar qué pieza falta, qué no estamos viendo.</p>
+          </div>
+          <div class="deca-item">
+            <div class="deca-dot a"></div>
+            <p class="deca-item-text"><strong>Peticiones efectivas</strong> → para cerrar: convertir lo conversado en un compromiso con todos sus elementos: quién, qué, para cuándo, con qué condiciones.</p>
+          </div>
+          <div class="deca-item">
+            <div class="deca-dot a"></div>
+            <p class="deca-item-text"><strong>Ciclo de coordinación</strong> → para sostener: el compromiso que nace de esta conversación entra al ciclo como cualquier otra promesa. Si hay quiebre, se renegocia —no se deja morir en silencio.</p>
+          </div>
+          <div class="deca-item">
+            <div class="deca-dot a"></div>
+            <p class="deca-item-text"><strong>Ciclo de reflexión</strong> → para aprender: después de la conversación, revisar qué funcionó, qué no, qué haría diferente. Y qué observador estuve siendo.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- 9. PRINCIPIOS DE CIERRE -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="section-block">
+      <span class="section-num">Para recordar</span>
+      <h2 class="section-title">Siete principios para conversaciones difíciles</h2>
+
+      <div class="fundar-stack">
+        <div class="fundar-row">
+          <div class="fundar-num">1</div>
+          <div class="fundar-body">
+            <h4>El conflicto no es el problema — la evitación sí</h4>
+            <p>La tensión entre personas que trabajan juntas es <strong>inevitable y natural</strong>. Lo que destruye equipos no es el desacuerdo, sino la acumulación de conversaciones que no se tienen.</p>
+          </div>
+        </div>
+        <div class="fundar-row">
+          <div class="fundar-num">2</div>
+          <div class="fundar-body">
+            <h4>No vengo a tener razón — vengo a entender</h4>
+            <p>Si entras a la conversación seguro de tu versión, <strong>ya perdiste la capacidad de escuchar</strong>. La disposición a cambiar de perspectiva es lo que el otro necesita ver para abrirse.</p>
+          </div>
+        </div>
+        <div class="fundar-row">
+          <div class="fundar-num">3</div>
+          <div class="fundar-body">
+            <h4>El respeto no se negocia</h4>
+            <p>Puedes estar en profundo desacuerdo y aun así <strong>tratar al otro como legítimo</strong>. El respeto no es aprobar lo que hace —es reconocer que actúa desde un contexto, presiones y estándares que quizás no ves.</p>
+          </div>
+        </div>
+        <div class="fundar-row">
+          <div class="fundar-num">4</div>
+          <div class="fundar-body">
+            <h4>Las emociones son información, no interferencia</h4>
+            <p>Si algo te molesta mucho, eso <strong>dice algo importante</strong> sobre lo que valoras. No se trata de no sentir —se trata de no actuar desde la pura reacción.</p>
+          </div>
+        </div>
+        <div class="fundar-row">
+          <div class="fundar-num">5</div>
+          <div class="fundar-body">
+            <h4>Temprano es mejor que perfecto</h4>
+            <p>Una conversación imperfecta hoy es <strong>más valiosa que una conversación perfecta que nunca llega</strong>. El resentimiento crece con el tiempo, no con la intensidad del problema original.</p>
+          </div>
+        </div>
+        <div class="fundar-row">
+          <div class="fundar-num">6</div>
+          <div class="fundar-body">
+            <h4>El problema es compartido — la responsabilidad también</h4>
+            <p>Si la escucha es corresponsabilidad de orador y oyente, <strong>el conflicto es corresponsabilidad de ambas partes</strong>. No se trata de repartir culpa, sino de reconocer que cada uno contribuye a la situación que quiere cambiar.</p>
+          </div>
+        </div>
+        <div class="fundar-row">
+          <div class="fundar-num">7</div>
+          <div class="fundar-body">
+            <h4>Toda conversación difícil bien llevada fortalece al equipo</h4>
+            <p>Un equipo que aprende a tener conversaciones difíciles <strong>no es un equipo sin conflictos</strong> —es un equipo con la confianza de que los conflictos se pueden abordar y resolver. Esa confianza es su activo más valioso.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="hr" />
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- 10. CROSS REFERENCES -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="section-block">
+      <span class="section-num">Profundizar</span>
+      <h2 class="section-title">Las herramientas en detalle</h2>
+      <p class="section-lead">
+        Esta guía integra competencias de todo el programa. Para revisar cada herramienta en profundidad:
+      </p>
+
+      <a class="cross-ref" href="retroalimentacion-juicios.html">
+        <div>
+          <div class="cross-ref-label">Distinción 03</div>
+          <div class="cross-ref-title">Retroalimentación Eficaz</div>
+          <div class="cross-ref-sub">Las cinco condiciones para fundar un juicio. Cómo entregar y recibir feedback.</div>
+        </div>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+      </a>
+
+      <a class="cross-ref" href="proposicion-indagacion.html">
+        <div>
+          <div class="cross-ref-label">Distinción 02</div>
+          <div class="cross-ref-title">Proposición, Indagación y Escucha</div>
+          <div class="cross-ref-sub">Las cuatro modalidades de indagación. Verificar escuchas. Compartir inquietudes.</div>
+        </div>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+      </a>
+
+      <a class="cross-ref" href="peticiones-efectivas.html">
+        <div>
+          <div class="cross-ref-label">Distinción 05</div>
+          <div class="cross-ref-title">Peticiones Efectivas</div>
+          <div class="cross-ref-sub">Los nueve elementos de una petición completa. Los juicios que bloquean el pedir.</div>
+        </div>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+      </a>
+
+      <a class="cross-ref" href="ciclo-coordinacion.html">
+        <div>
+          <div class="cross-ref-label">Distinción 06</div>
+          <div class="cross-ref-title">Ciclo de Coordinación de Acciones</div>
+          <div class="cross-ref-sub">Las fases del ciclo. Reclamo vs. reproche. Renegociación e impecabilidad.</div>
+        </div>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+      </a>
+
+      <a class="cross-ref" href="ciclo-reflexion.html">
+        <div>
+          <div class="cross-ref-label">Distinción 04</div>
+          <div class="cross-ref-title">El Ciclo de la Reflexión</div>
+          <div class="cross-ref-sub">Observador — Acción — Resultado. Aprendizaje de primer y segundo orden.</div>
+        </div>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+      </a>
+
+      <a class="cross-ref" href="dei-identidad.html">
+        <div>
+          <div class="cross-ref-label">Distinción 01</div>
+          <div class="cross-ref-title">Diseño Estratégico de Identidad</div>
+          <div class="cross-ref-sub">De quiénes somos a quiénes queremos ser. Juicios actuales y juicios futuros.</div>
+        </div>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+      </a>
+    </div>
+
+  </div><!-- /content -->
+
+</body>
+</html>

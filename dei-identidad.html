@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Diseño Estratégico de Identidad — IMATECSALUD</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0F1117;
+      --surface:  #181B23;
+      --surface2: #1F2330;
+      --border:   #2A2F3E;
+      --accent:   #4F7CFF;
+      --accent2:  #7C3AED;
+      --gold:     #F59E0B;
+      --teal:     #14B8A6;
+      --red:      #EF4444;
+      --green:    #10B981;
+      --text:     #E8ECF5;
+      --muted:    #8892AA;
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── NAV ── */
+    .topnav {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(15,17,23,0.88);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 32px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .back-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 13px; font-weight: 500;
+      color: var(--muted); text-decoration: none;
+      transition: color 0.15s;
+    }
+    .back-btn:hover { color: var(--text); }
+    .topnav-sep { color: var(--border); font-size: 18px; }
+    .topnav-title { font-size: 13px; font-weight: 600; color: var(--text); }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative; overflow: hidden;
+      padding: 80px 32px 68px; text-align: center;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 70% 55% at 50% 0%, rgba(124,58,237,0.13) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 40% at 80% 80%, rgba(79,124,255,0.07) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 11px; font-weight: 600; letter-spacing: 2.5px;
+      text-transform: uppercase; color: var(--accent2);
+      margin-bottom: 18px;
+      border: 1px solid rgba(124,58,237,0.3);
+      border-radius: 20px; padding: 5px 14px;
+      background: rgba(124,58,237,0.08);
+    }
+    .hero h1 {
+      font-size: clamp(28px, 5vw, 50px); font-weight: 700;
+      line-height: 1.15; margin-bottom: 10px;
+    }
+    .hero h1 em {
+      font-style: normal;
+      background: linear-gradient(135deg, var(--accent2), var(--accent));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-sub {
+      font-size: 15px; color: var(--muted); margin-bottom: 8px;
+    }
+    .hero-org {
+      font-size: 12px; color: var(--border); letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    /* ── VERSION PILLS ── */
+    .version-strip {
+      display: flex; justify-content: center; gap: 10px;
+      flex-wrap: wrap; margin-top: 28px;
+    }
+    .vpill {
+      font-size: 11px; font-weight: 600; letter-spacing: 1px;
+      padding: 5px 14px; border-radius: 20px;
+      border: 1px solid var(--border); color: var(--muted);
+    }
+    .vpill.done {
+      background: rgba(16,185,129,0.08);
+      border-color: rgba(16,185,129,0.25);
+      color: var(--green);
+    }
+    .vpill.pending {
+      background: rgba(245,158,11,0.07);
+      border-color: rgba(245,158,11,0.2);
+      color: var(--gold); opacity: 0.6;
+    }
+
+    /* ── CONTENT ── */
+    .content {
+      max-width: 960px; margin: 0 auto;
+      padding: 0 32px 100px;
+    }
+
+    /* ── SECTION BLOCK ── */
+    .section-block { margin-bottom: 68px; }
+    .section-num {
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 2px; color: var(--accent2);
+      text-transform: uppercase; margin-bottom: 8px;
+      display: block;
+    }
+    .section-title {
+      font-size: 22px; font-weight: 700;
+      color: var(--text); margin-bottom: 14px; line-height: 1.3;
+    }
+    .section-lead {
+      font-size: 15px; color: var(--muted);
+      line-height: 1.8; max-width: 760px;
+    }
+    .section-lead strong { color: var(--text); font-weight: 500; }
+    .section-lead em { font-style: italic; color: var(--text); }
+
+    /* ── INTRO CONCEPT BOX ── */
+    .concept-box {
+      background: linear-gradient(135deg, rgba(124,58,237,0.07), rgba(79,124,255,0.06));
+      border: 1px solid rgba(124,58,237,0.2);
+      border-radius: 14px;
+      padding: 32px 36px;
+      margin-top: 32px;
+      position: relative;
+      overflow: hidden;
+    }
+    .concept-box::before {
+      content: 'DEI';
+      position: absolute; right: 28px; top: 50%;
+      transform: translateY(-50%);
+      font-size: 72px; font-weight: 800;
+      color: rgba(124,58,237,0.07);
+      letter-spacing: -2px;
+      user-select: none;
+    }
+    .concept-loop {
+      display: flex; align-items: center; gap: 0;
+      margin-bottom: 24px; flex-wrap: wrap; gap: 8px;
+    }
+    .cl-node {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px; padding: 10px 16px;
+      font-size: 13px; font-weight: 600; color: var(--text);
+      display: flex; align-items: center; gap: 7px;
+    }
+    .cl-node .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+    }
+    .cl-node .dot.purple { background: var(--accent2); }
+    .cl-node .dot.blue   { background: var(--accent); }
+    .cl-arrow {
+      font-size: 18px; color: var(--border); padding: 0 4px;
+    }
+    .concept-text {
+      font-size: 14px; color: var(--muted);
+      line-height: 1.8; max-width: 700px;
+    }
+    .concept-text strong { color: var(--text); font-weight: 500; }
+
+    /* ── DEI TABLE ── */
+    .dei-table-wrap {
+      margin-top: 24px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .dei-table-scroll { overflow-x: auto; }
+    .dei-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--surface);
+    }
+    .dei-table thead tr {
+      background: linear-gradient(90deg, rgba(79,124,255,0.09), rgba(124,58,237,0.07));
+      border-bottom: 1px solid var(--border);
+    }
+    .dei-table thead th {
+      padding: 14px 20px;
+      text-align: left;
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase;
+    }
+    .dei-table thead th.th-dim  { color: var(--muted); width: 110px; }
+    .dei-table thead th.th-act  { color: var(--red); }
+    .dei-table thead th.th-fut  { color: var(--green); border-left: 1px solid var(--border); }
+    .dei-table tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.15s;
+      vertical-align: top;
+    }
+    .dei-table tbody tr:last-child { border-bottom: none; }
+    .dei-table tbody tr:nth-child(even) { background: rgba(255,255,255,0.015); }
+    .dei-table tbody tr:hover { background: rgba(79,124,255,0.05); }
+    .dei-table td {
+      padding: 16px 20px;
+      font-size: 13.5px; color: var(--muted);
+      line-height: 1.7; vertical-align: top;
+    }
+    .dei-table td strong { color: var(--text); font-weight: 500; }
+    .dei-table td.td-dim {
+      font-size: 10px; font-weight: 800; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--muted);
+      white-space: nowrap; border-right: 1px solid var(--border);
+      background: rgba(255,255,255,0.01);
+    }
+    .dei-table td.td-act { border-right: 1px solid var(--border); }
+    .dei-table td ul { list-style: none; padding: 0; margin: 0; }
+    .dei-table td ul li {
+      padding: 5px 0 5px 18px; position: relative; line-height: 1.65;
+      border-bottom: 1px solid rgba(255,255,255,0.035);
+    }
+    .dei-table td ul li:last-child { border-bottom: none; }
+    .dei-table td.td-act ul li::before {
+      content: '·'; position: absolute; left: 5px;
+      color: var(--red); font-size: 18px; line-height: 0.9;
+    }
+    .dei-table td.td-fut ul li::before {
+      content: '✓'; position: absolute; left: 1px;
+      color: var(--green); font-size: 11px; top: 8px;
+    }
+    /* instrucción + ejemplo para la tabla del modelo */
+    .dei-table td .instr {
+      font-size: 12.5px; color: var(--muted); font-style: italic;
+      border-left: 2px solid rgba(124,58,237,0.3);
+      padding-left: 10px; margin-bottom: 10px; line-height: 1.65;
+      display: block;
+    }
+    .dei-table td .instr strong { color: var(--text); font-weight: 500; }
+    .dei-table td .ejemplo {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 9px 13px;
+      font-size: 12px; color: var(--muted); font-style: italic;
+      line-height: 1.6; display: block;
+    }
+    .dei-table td .ejemplo em { color: var(--text); font-style: normal; }
+
+    /* ── ESTRATEGIAS ── */
+    .estrategias-stack {
+      display: flex; flex-direction: column; gap: 12px;
+      margin-top: 24px;
+    }
+    .est-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden;
+      display: grid; grid-template-columns: 220px 1fr;
+    }
+    @media (max-width: 580px) { .est-card { grid-template-columns: 1fr; } }
+
+    .est-label-col {
+      padding: 20px 20px;
+      display: flex; flex-direction: column;
+      justify-content: center; gap: 6px;
+      border-right: 1px solid var(--border);
+    }
+    .est-tag {
+      font-size: 9px; font-weight: 800;
+      letter-spacing: 2px; text-transform: uppercase;
+      border-radius: 4px; padding: 3px 8px;
+      display: inline-block; width: fit-content;
+    }
+    .est-tag.hoy    { background: rgba(79,124,255,0.12); color: var(--accent); }
+    .est-tag.ord1   { background: rgba(20,184,166,0.12); color: var(--teal); }
+    .est-tag.ord2   { background: rgba(124,58,237,0.12); color: var(--accent2); }
+    .est-tag.coach  { background: rgba(245,158,11,0.12); color: var(--gold); }
+
+    .est-title { font-size: 13px; font-weight: 600; color: var(--text); line-height: 1.4; }
+    .est-sub   { font-size: 11.5px; color: var(--muted); line-height: 1.5; }
+
+    .est-items-col { padding: 18px 22px; }
+    .est-items-col ul { list-style: none; padding: 0; }
+    .est-items-col ul li {
+      font-size: 13px; color: var(--muted);
+      padding: 6px 0 6px 18px; position: relative;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      line-height: 1.6;
+    }
+    .est-items-col ul li:last-child { border-bottom: none; }
+    .est-items-col ul li::before {
+      content: '→';
+      position: absolute; left: 0;
+      color: var(--accent); font-size: 11px;
+    }
+    .est-items-col ul li strong { color: var(--text); font-weight: 500; }
+
+    /* ── GLOSARIO ── */
+    .glosario-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 14px; margin-top: 24px;
+    }
+    .glos-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px; padding: 18px 20px;
+    }
+    .glos-term {
+      font-size: 11px; font-weight: 700; letter-spacing: 1.5px;
+      text-transform: uppercase; color: var(--accent2); margin-bottom: 8px;
+    }
+    .glos-def {
+      font-size: 12.5px; color: var(--muted); line-height: 1.7;
+    }
+    .glos-def strong { color: var(--text); font-weight: 500; }
+
+    /* ── FOOTER ── */
+    .page-footer { text-align: center; padding: 0 32px 64px; }
+    .back-link-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 12px 24px;
+      font-size: 13px; font-weight: 500;
+      color: var(--muted); text-decoration: none;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .back-link-btn:hover { border-color: var(--accent2); color: var(--text); }
+
+    .hr { border: none; border-top: 1px solid var(--border); margin: 52px 0; }
+
+    /* ── MODELO / GUÍA ── */
+    .modelo-wrap {
+      margin-top: 28px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .modelo-section-header {
+      padding: 16px 24px;
+      background: linear-gradient(90deg, rgba(124,58,237,0.09), rgba(79,124,255,0.06));
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .modelo-section-header .msh-tag {
+      font-size: 9px; font-weight: 800; letter-spacing: 2px;
+      text-transform: uppercase; border-radius: 4px; padding: 3px 9px;
+    }
+    .msh-tag.juicios { background: rgba(124,58,237,0.14); color: var(--accent2); }
+    .msh-tag.acciones { background: rgba(79,124,255,0.14); color: var(--accent); }
+    .msh-tag.estrategias { background: rgba(245,158,11,0.14); color: var(--gold); }
+    .modelo-section-header p {
+      font-size: 13px; color: var(--muted); line-height: 1.65;
+      flex: 1;
+    }
+    .modelo-section-header p strong { color: var(--text); font-weight: 500; }
+
+    .modelo-cols {
+      display: grid; grid-template-columns: 1fr 40px 1fr;
+      align-items: stretch;
+    }
+    @media (max-width: 640px) { .modelo-cols { grid-template-columns: 1fr; } }
+    .modelo-col-hdr {
+      font-size: 9px; font-weight: 800; letter-spacing: 2px;
+      text-transform: uppercase; padding: 10px 22px;
+      border-bottom: 1px solid var(--border);
+    }
+    .modelo-col-hdr.neg { color: var(--red); background: rgba(239,68,68,0.04); }
+    .modelo-col-hdr.pos { color: var(--green); background: rgba(16,185,129,0.04); border-left: 1px solid var(--border); }
+    .modelo-col-div-hdr { border-bottom: 1px solid var(--border); }
+    .modelo-cell {
+      padding: 20px 22px;
+      font-size: 13px; color: var(--muted); line-height: 1.75;
+    }
+    .modelo-cell.neg { background: rgba(239,68,68,0.02); border-right: 1px solid var(--border); }
+    .modelo-cell.pos { background: rgba(16,185,129,0.02); border-left: 1px solid var(--border); }
+    .modelo-cell strong { color: var(--text); font-weight: 500; }
+    .modelo-cell .instr {
+      font-size: 12px; color: var(--muted); font-style: italic;
+      border-left: 2px solid rgba(124,58,237,0.3);
+      padding-left: 10px; margin-bottom: 12px; line-height: 1.65;
+    }
+    .modelo-cell .ejemplo {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 10px 14px;
+      font-size: 12px; color: var(--muted); font-style: italic;
+      margin-top: 8px; line-height: 1.6;
+    }
+    .modelo-cell .ejemplo em { color: var(--text); font-style: normal; }
+    .modelo-cell-div {
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; color: var(--border);
+    }
+    @media (max-width: 640px) { .modelo-cell.neg { border-right: none; border-bottom: 1px solid var(--border); } .modelo-cell.pos { border-left: none; } .modelo-cell-div { display: none; } .modelo-col-div-hdr { display: none; } }
+
+    .modelo-strat-rows { border-top: 1px solid var(--border); }
+    .modelo-strat-row {
+      display: grid; grid-template-columns: 200px 1fr;
+      border-bottom: 1px solid rgba(42,47,62,0.5);
+    }
+    .modelo-strat-row:last-child { border-bottom: none; }
+    @media (max-width: 580px) { .modelo-strat-row { grid-template-columns: 1fr; } }
+    .msr-label {
+      padding: 18px 20px; border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .msr-body {
+      padding: 18px 22px;
+      font-size: 13px; color: var(--muted); line-height: 1.75;
+    }
+    .msr-body strong { color: var(--text); font-weight: 500; }
+    .msr-body .ejemplo {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 10px 14px;
+      font-size: 12px; color: var(--muted); font-style: italic;
+      margin-top: 10px; line-height: 1.6;
+    }
+    .msr-body .ejemplo em { color: var(--text); font-style: normal; }
+
+    /* ── REGISTRO DEL PROCESO ── */
+    .registro-header {
+      display: flex; align-items: center; gap: 14px;
+      background: linear-gradient(135deg, rgba(124,58,237,0.09), rgba(79,124,255,0.07));
+      border: 1px solid rgba(124,58,237,0.2);
+      border-radius: 14px; padding: 22px 28px; margin-bottom: 28px;
+    }
+    .registro-icon { font-size: 28px; flex-shrink: 0; }
+    .registro-header h3 { font-size: 17px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .registro-header p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+    .registro-badge {
+      font-size: 9px; font-weight: 800; letter-spacing: 1.5px;
+      text-transform: uppercase; border-radius: 4px; padding: 3px 9px;
+      background: rgba(16,185,129,0.12); color: var(--green);
+      margin-left: auto; flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="topnav">
+    <a class="back-btn" href="coaching-cierre.html">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      Volver al programa
+    </a>
+    <span class="topnav-sep">/</span>
+    <span class="topnav-title">Diseño Estratégico de Identidad</span>
+  </nav>
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="hero-eyebrow">🧭 Distinción 01</div>
+    <h1>Diseño Estratégico<br>de <em>Identidad</em></h1>
+    <p class="hero-sub">De quiénes somos a quiénes queremos ser</p>
+    <p class="hero-org">IMATECSALUD &nbsp;·&nbsp; © ECORE Newfield Consulting</p>
+    <div class="version-strip">
+      <span class="vpill done">Versión 1 &nbsp;·&nbsp; 16 oct 2025</span>
+      <span class="vpill done">Versión 2 &nbsp;·&nbsp; 11 nov 2025</span>
+      <span class="vpill pending">Versión 3 &nbsp;·&nbsp; Por definir</span>
+    </div>
+  </header>
+
+  <div class="content">
+
+    <!-- INTRO -->
+    <div class="section-block">
+      <span class="section-num">¿Qué es el DEI?</span>
+      <h2 class="section-title">La identidad como punto de partida del cambio</h2>
+      <p class="section-lead">
+        El Diseño Estratégico de Identidad parte de una premisa simple pero poderosa: no podemos actuar diferente si seguimos observando igual. Los <strong>juicios que tenemos sobre nosotros</strong> —como equipo, como organización— condicionan profundamente las acciones que tomamos. Pero la relación no es de una sola vía: <em>al desafiar esos juicios y atrevernos a actuar de manera distinta, ese nuevo actuar comienza, a su vez, a transformar los juicios que sostenemos sobre quiénes somos</em>. Es un ciclo virtuoso: nuevas acciones generan nueva evidencia, y esa nueva evidencia nos permite construir una identidad diferente.
+      </p>
+
+      <div class="concept-box">
+        <div class="concept-loop">
+          <div class="cl-node"><span class="dot purple"></span>Juicios actuales</div>
+          <div class="cl-arrow">→</div>
+          <div class="cl-node"><span class="dot blue"></span>Condicionan acciones</div>
+          <div class="cl-arrow">→</div>
+          <div class="cl-node"><span class="dot blue"></span>Nuevas acciones</div>
+          <div class="cl-arrow">→</div>
+          <div class="cl-node"><span class="dot purple"></span>Nuevos juicios</div>
+        </div>
+        <p class="concept-text">
+          El DEI es la herramienta que hace este ciclo <strong>visible y deliberado</strong>. En lugar de cambiar por accidente, el equipo se sienta a mapear conscientemente dónde está hoy —en términos de juicios y acciones— y dónde quiere estar. El resultado no es solo un plan: es una <strong>declaración de identidad futura</strong> que el equipo elige construir.
+        </p>
+      </div>
+    </div>
+
+    <!-- MODELO: CÓMO CONSTRUIR EL TUYO -->
+    <div class="section-block">
+      <span class="section-num">El modelo — cómo construir el tuyo</span>
+      <h2 class="section-title">Instrucciones para armar un DEI</h2>
+      <p class="section-lead">El DEI tiene una estructura fija: dos filas (juicios y acciones), dos columnas (situación actual y futura), y una sección de estrategias de aprendizaje. Cada celda tiene una pregunta específica que responder.</p>
+
+      <!-- Tabla comparativa: instrucciones -->
+      <div class="dei-table-wrap">
+        <div class="dei-table-scroll">
+          <table class="dei-table">
+            <thead>
+              <tr>
+                <th class="th-dim">Dimensión</th>
+                <th class="th-act">Situación actual — ¿cómo soy/somos hoy?</th>
+                <th class="th-fut">Situación futura — ¿a qué aspiramos?</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="td-dim">Juicios</td>
+                <td class="td-act">
+                  <span class="instr">Escribe un <strong>juicio negativo</strong> sobre ti o el equipo. Algo que es necesario cambiar. Usa "soy…", "somos…" o "tenemos…"</span>
+                  <span class="ejemplo">Ej: <em>"Soy un líder que no genera espacios de conversación real con mi equipo."</em></span>
+                </td>
+                <td class="td-fut">
+                  <span class="instr">Escribe el <strong>juicio positivo aspiracional</strong> por el que quieres ser reconocido. El espejo del juicio actual, en futuro posible.</span>
+                  <span class="ejemplo">Ej: <em>"Soy un líder que escucha, coordina y genera compromisos claros con mi equipo."</em></span>
+                </td>
+              </tr>
+              <tr>
+                <td class="td-dim">Acciones</td>
+                <td class="td-act">
+                  <span class="instr">Lista las <strong>acciones que realizas hoy</strong> dado el juicio actual. Sé específico/a. Mientras más concretas, más fácil es el cambio. Si no encuentras acciones, el juicio puede no estar bien fundado.</span>
+                  <span class="ejemplo">Ej: <em>"Las reuniones son informativas, no conversacionales. No indago antes de opinar. Doy instrucciones sin verificar comprensión. Evito el feedback difícil."</em></span>
+                </td>
+                <td class="td-fut">
+                  <span class="instr">Lista las <strong>acciones que realizaría una persona</strong> reconocida por el juicio positivo. Puedes invertir las acciones actuales y agregar otras nuevas.</span>
+                  <span class="ejemplo">Ej: <em>"Abro espacio a la indagación en cada reunión. Verifico comprensión antes de cerrar. Doy retroalimentación con juicios fundados. Hago peticiones con condiciones de satisfacción claras."</em></span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Estrategias: tabla de tipo label→definición (contenido conceptual) -->
+      <div style="margin-top: 28px;">
+        <p style="font-size:13px; color:var(--muted); line-height:1.7; margin-bottom:16px;">
+          <strong style="color:var(--text);">Estrategias de aprendizaje</strong> — ¿Qué tienes que aprender para ir de las acciones actuales a las futuras? Hay cuatro niveles según la profundidad del cambio requerido.
+        </p>
+        <div class="estrategias-stack">
+          <div class="est-card">
+            <div class="est-label-col">
+              <span class="est-tag hoy">Acción inmediata</span>
+              <div class="est-title">Puedo emprender hoy</div>
+              <div class="est-sub">Sin mayor revisión personal</div>
+            </div>
+            <div class="est-items-col">
+              <ul><li>Acciones que puedes iniciar de inmediato, sin necesitar aprender algo nuevo primero. Son movimientos de bajo costo de entrada.</li></ul>
+              <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 13px;font-size:12px;color:var(--muted);font-style:italic;line-height:1.6;margin-top:10px;">Ej: <em style="color:var(--text);font-style:normal;">"Reservar 10 minutos al inicio de cada reunión para indagación genuina, sin pasar directo a la tarea."</em></div>
+            </div>
+          </div>
+          <div class="est-card">
+            <div class="est-label-col">
+              <span class="est-tag ord1">1er orden</span>
+              <div class="est-title">Aprendizaje de primer orden</div>
+              <div class="est-sub">Sin cambiar el observador</div>
+            </div>
+            <div class="est-items-col">
+              <ul><li>Aprendizajes <strong>inmediatos y prácticos</strong> que mejoran la acción sin modificar la forma de observar la realidad. Adquirir habilidades o herramientas específicas.</li></ul>
+              <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 13px;font-size:12px;color:var(--muted);font-style:italic;line-height:1.6;margin-top:10px;">Ej: <em style="color:var(--text);font-style:normal;">"Aprender a estructurar peticiones efectivas: quién, qué, para cuándo y bajo qué condiciones de satisfacción."</em></div>
+            </div>
+          </div>
+          <div class="est-card">
+            <div class="est-label-col">
+              <span class="est-tag ord2">2do orden</span>
+              <div class="est-title">Aprendizaje de segundo orden</div>
+              <div class="est-sub">Cambia el observador</div>
+            </div>
+            <div class="est-items-col">
+              <ul><li>Aprendizajes que <strong>modifican los juicios y supuestos centrales</strong> desde los que actúas. Cambio de fondo de mirada —estratégico. Requiere mayor tiempo.</li></ul>
+              <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 13px;font-size:12px;color:var(--muted);font-style:italic;line-height:1.6;margin-top:10px;">Ej: <em style="color:var(--text);font-style:normal;">"Revisar el juicio que tengo sobre mi equipo: ¿los observo como personas capaces o como ejecutores que necesitan control?"</em></div>
+            </div>
+          </div>
+          <div class="est-card">
+            <div class="est-label-col">
+              <span class="est-tag coach">Coaching</span>
+              <div class="est-title">Conversación de coaching</div>
+              <div class="est-sub">Requiere acompañamiento externo</div>
+            </div>
+            <div class="est-items-col">
+              <ul><li>Una <strong>conversación de coaching</strong> ayuda a mirar aquello que necesitas aprender para cambiar tu observador —lo que, por ser punto ciego, no puedes ver solo/a.</li></ul>
+              <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 13px;font-size:12px;color:var(--muted);font-style:italic;line-height:1.6;margin-top:10px;">Ej: <em style="color:var(--text);font-style:normal;">"Explorar qué me lleva a evitar las conversaciones difíciles: ¿miedo al conflicto, al juicio de los demás, o a no saber cómo conducirlas?"</em></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="hr" />
+
+    <!-- SITUACIÓN ACTUAL → FUTURA -->
+    <div class="section-block">
+      <div class="registro-header">
+        <span class="registro-icon">📋</span>
+        <div>
+          <h3>DEI del proceso — IMATECSALUD</h3>
+          <p>Registro del trabajo realizado durante el programa de coaching organizacional 2025–2026. Este es el DEI que construimos juntos.</p>
+        </div>
+        <span class="registro-badge">Registro oficial</span>
+      </div>
+
+      <span class="section-num">El mapa del equipo</span>
+      <h2 class="section-title">Situación Actual → Situación Futura</h2>
+      <p class="section-lead">Dos dimensiones definen el estado del equipo: los <strong>juicios</strong> (cómo nos observamos) y las <strong>acciones</strong> (cómo nos comportamos). El DEI trabaja ambas en paralelo.</p>
+
+      <div class="dei-table-wrap" style="margin-top: 28px;">
+        <div class="dei-table-scroll">
+          <table class="dei-table">
+            <thead>
+              <tr>
+                <th class="th-dim">Dimensión</th>
+                <th class="th-act">Situación actual</th>
+                <th class="th-fut">Situación futura</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- JUICIOS -->
+              <tr>
+                <td class="td-dim">Juicios</td>
+                <td class="td-act">
+                  <ul>
+                    <li>Nuestra <strong>comunicación entre áreas</strong> es poco fluida.</li>
+                    <li>Tenemos dificultades para asegurar el <strong>cumplimiento de protocolos</strong> e instrucciones.</li>
+                  </ul>
+                </td>
+                <td class="td-fut">
+                  <ul>
+                    <li>Tenemos <strong>comunicación fluida y eficaz</strong> entre áreas.</li>
+                    <li>Somos capaces de generar un sistema en el que se <strong>respeten los protocolos</strong>, se sigan las instrucciones, y se converse la posibilidad de modificarlos.</li>
+                  </ul>
+                </td>
+              </tr>
+              <!-- ACCIONES -->
+              <tr>
+                <td class="td-dim">Acciones</td>
+                <td class="td-act">
+                  <ul>
+                    <li>Buscamos resolver problemáticas de manera <strong>individual, sin pedir ayuda</strong> o indagar.</li>
+                    <li>Evitamos <strong>abrir conversaciones</strong> con algunas personas.</li>
+                    <li>No comunicamos <strong>nueva información</strong> a todo el personal involucrado.</li>
+                  </ul>
+                </td>
+                <td class="td-fut">
+                  <ul>
+                    <li><strong>Comunicamos nueva información y decisiones</strong> a todas las áreas involucradas. Acusamos recibo para confirmar la toma de conocimiento.</li>
+                    <li><strong>Respondemos a toda solicitud en un plazo de 24 horas</strong>, confirmando cumplimiento o avisando que el requerimiento fue recibido. Aplicamos el ciclo de coordinación de acciones.</li>
+                    <li>Ante un imprevisto, <strong>indagamos primero y proponemos después</strong>. Según la complejidad, decidimos si abordarlo individualmente o de forma colectiva.</li>
+                    <li><strong>Revisamos periódicamente el cumplimiento de protocolos</strong> en el área clínica y administrativa.</li>
+                    <li>Solicitamos y entregamos <strong>retroalimentación eficaz</strong>.</li>
+                  </ul>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ESTRATEGIAS DE APRENDIZAJE -->
+    <div class="section-block">
+      <span class="section-num" style="color:var(--green);">IMATECSALUD · Registro del proceso</span>
+      <h2 class="section-title">Estrategias de aprendizaje</h2>
+      <p class="section-lead">
+        Ideas y posibilidades que conectan la situación actual con la futura. No son compromisos definitivos: son el <strong>menú de movimientos posibles</strong>. El equipo elige cuáles activar y cuándo.
+      </p>
+
+      <div class="estrategias-stack">
+
+        <!-- HOY -->
+        <div class="est-card">
+          <div class="est-label-col">
+            <span class="est-tag hoy">Acción inmediata</span>
+            <div class="est-title">Podemos emprender hoy</div>
+            <div class="est-sub">No requieren aprendizaje previo</div>
+          </div>
+          <div class="est-items-col">
+            <ul>
+              <li>Probar conocimientos sobre protocolos periódicamente.</li>
+              <li>Generar <strong>reuniones interdepartamentales</strong> periódicas.</li>
+              <li>Centralizar información en un lugar accesible (<strong>boletín semanal</strong>).</li>
+              <li>Crear un listado de dudas y ambigüedades sobre la cadena de mando y roles.</li>
+              <li>Solicitar definiciones de dirección organizacional a la dirección.</li>
+              <li>Crear <strong>grupo de jefaturas</strong> para correos <em>(hecho)</em>.</li>
+              <li>Reiterar la difusión de información nueva más veces.</li>
+              <li>Crear una intranet.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- PRIMER ORDEN -->
+        <div class="est-card">
+          <div class="est-label-col">
+            <span class="est-tag ord1">1er orden</span>
+            <div class="est-title">Aprendizaje de primer orden</div>
+            <div class="est-sub">Sin cambiar el observador</div>
+          </div>
+          <div class="est-items-col">
+            <ul>
+              <li>Aprender a usar un <strong>gestor de solicitudes online</strong>.</li>
+              <li>Utilizar <strong>herramientas de IA</strong> para tomar notas en reuniones de trabajo.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- SEGUNDO ORDEN -->
+        <div class="est-card">
+          <div class="est-label-col">
+            <span class="est-tag ord2">2do orden</span>
+            <div class="est-title">Aprendizaje de segundo orden</div>
+            <div class="est-sub">Cambia o amplía el observador</div>
+          </div>
+          <div class="est-items-col">
+            <ul>
+              <li>Aprender a <strong>construir confianza</strong> con otro trabajador.</li>
+              <li>Hacer <strong>peticiones efectivas</strong> en contextos incómodos.</li>
+              <li>Gestionar <strong>compromisos adquiridos</strong>.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- COACHING -->
+        <div class="est-card">
+          <div class="est-label-col">
+            <span class="est-tag coach">Coaching</span>
+            <div class="est-title">Declaramos que no podemos aprender solos</div>
+            <div class="est-sub">Requiere acompañamiento externo</div>
+          </div>
+          <div class="est-items-col">
+            <ul>
+              <li><strong>Confiar y generar confianza</strong> con otros trabajadores.</li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <hr class="hr" />
+
+    <!-- GLOSARIO -->
+    <div class="section-block">
+      <span class="section-num">Referencia</span>
+      <h2 class="section-title">Glosario de conceptos</h2>
+      <div class="glosario-grid">
+        <div class="glos-card">
+          <div class="glos-term">Acción</div>
+          <p class="glos-def">Lo que hacemos en cada situación particular. Es el <strong>vehículo que produce los resultados</strong> deseados o indeseados.</p>
+        </div>
+        <div class="glos-card">
+          <div class="glos-term">Juicio</div>
+          <p class="glos-def">Acto lingüístico con el que <strong>calificamos el acontecer</strong> que observamos. Importante distinguir nuestras acciones de los juicios que les atribuimos.</p>
+        </div>
+        <div class="glos-card">
+          <div class="glos-term">Aprendizaje 1er orden</div>
+          <p class="glos-def">Dirigido a <strong>mejorar la acción</strong> sin necesariamente modificar la forma en que observamos la realidad.</p>
+        </div>
+        <div class="glos-card">
+          <div class="glos-term">Aprendizaje 2do orden</div>
+          <p class="glos-def">Dirigido al <strong>observador mismo</strong>. Modifica los supuestos, creencias y juicios desde los cuales actuamos.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div class="page-footer">
+    <a class="back-link-btn" href="coaching-cierre.html">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      Volver al programa de cierre
+    </a>
+  </div>
+
+</body>
+</html>
