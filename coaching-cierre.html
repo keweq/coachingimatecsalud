@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cierre — Coaching Organizacional</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0F1117;
+      --surface: #181B23;
+      --surface2: #1F2330;
+      --border: #2A2F3E;
+      --accent: #4F7CFF;
+      --accent2: #7C3AED;
+      --gold: #F59E0B;
+      --text: #E8ECF5;
+      --muted: #8892AA;
+      --success: #10B981;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      text-align: center;
+      padding: 64px 24px 48px;
+      position: relative;
+    }
+    .header::after {
+      content: '';
+      display: block;
+      width: 60px;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      margin: 24px auto 0;
+      border-radius: 2px;
+    }
+    .header .label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+    .header h1 {
+      font-size: clamp(26px, 4vw, 40px);
+      font-weight: 700;
+      line-height: 1.2;
+      color: var(--text);
+    }
+    .header h1 span {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .header p {
+      margin-top: 14px;
+      font-size: 15px;
+      color: var(--muted);
+      max-width: 520px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.7;
+    }
+
+    /* ── SECTION TITLES ── */
+    .section-header {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px 20px;
+    }
+    .section-header h2 {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-header h2::before {
+      content: '';
+      display: inline-block;
+      width: 18px;
+      height: 2px;
+      background: var(--accent);
+      border-radius: 1px;
+    }
+
+    /* ── CARDS GRID ── */
+    .cards-grid {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+      position: relative;
+    }
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+      border-color: var(--accent);
+    }
+    .card.active {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent), 0 12px 40px rgba(79,124,255,0.15);
+    }
+
+    .card-accent-bar {
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+    }
+
+    .card-body {
+      padding: 24px;
+    }
+
+    .card-number {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--accent);
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 1.4;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .card-title .slash {
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    .card-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+      margin-bottom: 14px;
+      background: rgba(79,124,255,0.1);
+    }
+
+    .card-toggle {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 18px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--accent);
+    }
+    .card-toggle svg {
+      transition: transform 0.25s ease;
+    }
+    .card.active .card-toggle svg {
+      transform: rotate(180deg);
+    }
+
+    /* ── CARD EXPANDED CONTENT ── */
+    .card-expand {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s ease;
+    }
+    .card.active .card-expand {
+      max-height: 600px;
+    }
+
+    .card-expand-inner {
+      padding: 0 24px 24px;
+      border-top: 1px solid var(--border);
+      margin-top: 4px;
+      padding-top: 18px;
+    }
+
+    .expand-section {
+      margin-bottom: 16px;
+    }
+    .expand-section:last-child { margin-bottom: 0; }
+    .expand-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 7px;
+    }
+    .expand-text {
+      font-size: 13.5px;
+      color: var(--muted);
+      line-height: 1.75;
+    }
+    .expand-text strong { color: var(--text); font-weight: 500; }
+
+    .expand-list {
+      list-style: none;
+      padding: 0;
+    }
+    .expand-list li {
+      font-size: 13px;
+      color: var(--muted);
+      padding: 5px 0;
+      padding-left: 16px;
+      position: relative;
+      line-height: 1.6;
+    }
+    .expand-list li::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      font-size: 11px;
+    }
+
+    /* ── BITÁCORA / TIMELINE TABLE ── */
+    .bitacora-section {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+    }
+
+    .bitacora-table-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    .bitacora-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .bitacora-table thead tr {
+      background: linear-gradient(90deg, rgba(79,124,255,0.1), rgba(124,58,237,0.07));
+      border-bottom: 1px solid var(--border);
+    }
+
+    .bitacora-table thead th {
+      padding: 14px 20px;
+      text-align: left;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .bitacora-table tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.15s;
+    }
+    .bitacora-table tbody tr:last-child { border-bottom: none; }
+    .bitacora-table tbody tr:nth-child(even) { background: rgba(255,255,255,0.015); }
+    .bitacora-table tbody tr:hover { background: rgba(79,124,255,0.05); }
+
+    .bitacora-table td {
+      padding: 14px 20px;
+      font-size: 13.5px;
+      color: var(--muted);
+      vertical-align: middle;
+      line-height: 1.5;
+    }
+
+    .session-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: rgba(79,124,255,0.12);
+      border: 1px solid rgba(79,124,255,0.25);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+    .session-badge.last {
+      background: rgba(245,158,11,0.12);
+      border-color: rgba(245,158,11,0.3);
+      color: var(--gold);
+      font-size: 10px;
+    }
+    .session-cell {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .session-label { color: var(--text); font-weight: 500; font-size: 13px; }
+
+    .date-chip {
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .topic-text { color: var(--muted); }
+    .topic-text strong { color: var(--text); font-weight: 500; }
+
+    .upcoming-row td { opacity: 0.65; }
+    .upcoming-chip {
+      display: inline-block;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      background: rgba(245,158,11,0.12);
+      color: var(--gold);
+      border-radius: 4px;
+      padding: 2px 7px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    /* ── DIVIDER ── */
+    .divider {
+      max-width: 1100px;
+      margin: 0 auto 48px;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+    .divider span {
+      font-size: 18px;
+    }
+
+    /* ── COMMITMENT SECTION ── */
+    .commitment-section {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+    }
+
+    .commitment-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .commitment-header {
+      background: linear-gradient(135deg, rgba(79,124,255,0.12), rgba(124,58,237,0.10));
+      border-bottom: 1px solid var(--border);
+      padding: 32px 36px;
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+    }
+    .commitment-icon {
+      font-size: 32px;
+      line-height: 1;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .commitment-header h2 {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .commitment-header p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 580px;
+    }
+
+    .commitment-body {
+      padding: 32px 36px;
+    }
+
+    .placeholder-note {
+      background: rgba(245,158,11,0.07);
+      border: 1px dashed rgba(245,158,11,0.35);
+      border-radius: 10px;
+      padding: 20px 24px;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      margin-bottom: 28px;
+    }
+    .placeholder-note .note-icon { font-size: 18px; flex-shrink: 0; }
+    .placeholder-note p {
+      font-size: 13px;
+      color: var(--gold);
+      line-height: 1.65;
+      opacity: 0.9;
+    }
+
+    .commitment-placeholder {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .cp-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 22px;
+      opacity: 0.5;
+      cursor: not-allowed;
+      position: relative;
+    }
+    .cp-card .cp-icon {
+      font-size: 22px;
+      margin-bottom: 10px;
+    }
+    .cp-card h4 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .cp-card p {
+      font-size: 12.5px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .cp-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      background: rgba(245,158,11,0.15);
+      color: var(--gold);
+      border-radius: 4px;
+      padding: 3px 7px;
+    }
+
+    /* ── FOOTER ── */
+    .footer {
+      text-align: center;
+      padding: 32px 24px 48px;
+      font-size: 12px;
+      color: var(--border);
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 600px) {
+      .commitment-header { flex-direction: column; gap: 12px; padding: 24px; }
+      .commitment-body { padding: 24px; }
+      .commitment-placeholder { grid-template-columns: 1fr; }
+    }
+
+    /* ══════════════════════════════════════════
+       COMPROMISO DE CONTINUIDAD — nuevos estilos
+    ══════════════════════════════════════════ */
+
+    /* Bloques secuenciales */
+    .commit-block {
+      margin-bottom: 40px;
+      padding-bottom: 40px;
+      border-bottom: 1px solid var(--border);
+    }
+    .commit-block:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+    .commit-eyebrow {
+      font-size: 10px; font-weight: 700; letter-spacing: 2.5px;
+      text-transform: uppercase; color: var(--accent);
+      margin-bottom: 8px; display: block;
+    }
+    .commit-q {
+      font-size: 18px; font-weight: 700; color: var(--text);
+      line-height: 1.35; margin-bottom: 12px;
+    }
+    .commit-lead {
+      font-size: 13.5px; color: var(--muted); line-height: 1.8;
+      max-width: 720px; margin-bottom: 22px;
+    }
+    .commit-lead strong { color: var(--text); font-weight: 500; }
+
+    /* Grid de distinciones (7 mini-cards) */
+    .distincion-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 12px;
+    }
+    .dist-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 18px;
+      text-decoration: none;
+      transition: border-color 0.18s, transform 0.18s;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .dist-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+    .dist-card-top {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .dist-icon { font-size: 18px; }
+    .dist-badge {
+      font-size: 9px; font-weight: 800; letter-spacing: 1.5px;
+      text-transform: uppercase; border-radius: 4px;
+      padding: 3px 8px; flex-shrink: 0;
+    }
+    .dist-badge.num  { background: rgba(79,124,255,0.12); color: var(--accent); }
+    .dist-badge.intg { background: rgba(239,68,68,0.12);  color: #F87171; }
+    .dist-name {
+      font-size: 13px; font-weight: 600; color: var(--text);
+      line-height: 1.35;
+    }
+    .dist-link {
+      font-size: 11px; color: var(--accent); font-weight: 500;
+      display: flex; align-items: center; gap: 4px; margin-top: 2px;
+    }
+
+    /* 3 sub-preguntas del bloque 3 */
+    .commit-sub-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 6px;
+    }
+    .commit-sub-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px;
+    }
+    .sub-num {
+      font-size: 10px; font-weight: 800; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--gold);
+      margin-bottom: 8px; display: block;
+    }
+    .commit-sub-card h4 {
+      font-size: 13.5px; font-weight: 700; color: var(--text);
+      margin-bottom: 7px; line-height: 1.3;
+    }
+    .commit-sub-card p {
+      font-size: 12.5px; color: var(--muted); line-height: 1.65;
+    }
+
+    /* Callout de cierre */
+    .commit-callout {
+      background: linear-gradient(135deg, rgba(79,124,255,0.07), rgba(124,58,237,0.06));
+      border: 1px solid rgba(79,124,255,0.2);
+      border-radius: 14px;
+      padding: 28px 32px;
+      margin-top: 8px;
+    }
+    .commit-callout .cq-mark {
+      font-size: 44px; line-height: 0.8; color: rgba(79,124,255,0.2);
+      font-family: Georgia, serif; margin-bottom: 10px; display: block;
+    }
+    .commit-callout blockquote {
+      font-size: 15px; font-style: italic; color: var(--text);
+      line-height: 1.8; font-weight: 300; max-width: 680px;
+      margin-bottom: 14px;
+    }
+    .commit-callout .cq-sub {
+      font-size: 13px; color: var(--muted); line-height: 1.75;
+    }
+    .commit-callout .cq-sub strong { color: var(--text); font-weight: 500; }
+
+    /* ── SOSTENER EL APRENDIZAJE ── */
+    .sostener-section {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px 60px;
+    }
+    .sostener-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+      margin-top: 4px;
+    }
+    .sostener-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .sostener-card-header {
+      background: linear-gradient(135deg, rgba(79,124,255,0.09), rgba(124,58,237,0.07));
+      border-bottom: 1px solid var(--border);
+      padding: 16px 22px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .sostener-card-icon { font-size: 20px; }
+    .sostener-card-header h4 {
+      font-size: 14px; font-weight: 700; color: var(--text);
+    }
+    .sostener-card-header span {
+      font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+      text-transform: uppercase; color: var(--muted); margin-left: auto;
+    }
+    .sostener-card-body { padding: 18px 22px; }
+    .sostener-card-body p {
+      font-size: 13px; color: var(--muted); line-height: 1.75;
+      margin-bottom: 14px;
+    }
+    .sostener-card-body p strong { color: var(--text); font-weight: 500; }
+    .sostener-q-list { list-style: none; padding: 0; }
+    .sostener-q-list li {
+      font-size: 12.5px; color: var(--muted);
+      padding: 5px 0 5px 18px;
+      position: relative; line-height: 1.6;
+      border-top: 1px solid rgba(42,47,62,0.5);
+    }
+    .sostener-q-list li:first-child { border-top: none; }
+    .sostener-q-list li::before {
+      content: '→'; position: absolute; left: 0;
+      color: var(--accent); font-size: 11px;
+    }
+
+    /* ── HACIA ADELANTE ── */
+    .hacia-section {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+    }
+    .hacia-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 36px 40px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hacia-box::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 60% 70% at 90% 50%, rgba(124,58,237,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hacia-box p {
+      font-size: 14.5px; color: var(--muted); line-height: 1.85;
+      max-width: 700px; position: relative;
+    }
+    .hacia-box p strong { color: var(--text); font-weight: 500; }
+    .hacia-box p em { color: var(--accent); font-style: normal; font-weight: 500; }
+
+    /* Responsive nuevos componentes */
+    @media (max-width: 700px) {
+      .commit-sub-grid { grid-template-columns: 1fr; }
+      .sostener-grid   { grid-template-columns: 1fr; }
+      .hacia-box { padding: 24px; }
+    }
+    @media (max-width: 500px) {
+      .distincion-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <p class="label">Coaching Organizacional · Cierre</p>
+    <h1>Lo que <span>construimos</span> juntos</h1>
+    <p>10 sesiones · 5 meses de aprendizaje compartido.<br>Un recorrido por las distinciones que transforman cómo trabajamos y nos coordinamos.</p>
+  </header>
+
+  <!-- PART 1: CARDS -->
+  <div class="section-header">
+    <h2>Las 6 distinciones del programa</h2>
+  </div>
+
+  <div class="cards-grid" id="cardsGrid">
+
+    <!-- CARD 1 -->
+    <a class="card card-link" href="dei-identidad.html" style="text-decoration:none;">
+      <div class="card-accent-bar"></div>
+      <div class="card-body">
+        <div class="card-icon">🧭</div>
+        <span class="card-number">01</span>
+        <h3 class="card-title">Diseño Estratégico de Identidad<br><span class="slash">/ De Quiénes Somos a Quiénes Queremos Ser</span></h3>
+        <div class="card-toggle" style="color:var(--accent)">
+          Ver guía completa
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </div>
+    </a>
+
+    <!-- CARD 2 -->
+    <a class="card card-link" href="proposicion-indagacion.html" style="text-decoration:none;">
+      <div class="card-accent-bar"></div>
+      <div class="card-body">
+        <div class="card-icon">🔍</div>
+        <span class="card-number">02</span>
+        <h3 class="card-title">Proposición e Indagación</h3>
+        <div class="card-toggle" style="color:var(--accent)">
+          Ver guía completa
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </div>
+    </a>
+
+    <!-- CARD 3 -->
+    <a class="card card-link" href="retroalimentacion-juicios.html" style="text-decoration:none;">
+      <div class="card-accent-bar"></div>
+      <div class="card-body">
+        <div class="card-icon">💬</div>
+        <span class="card-number">03</span>
+        <h3 class="card-title">Retroalimentación Eficaz</h3>
+        <div class="card-toggle" style="color:var(--accent)">
+          Ver guía completa
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </div>
+    </a>
+
+    <!-- CARD 4 -->
+    <a class="card card-link" href="ciclo-reflexion.html" style="text-decoration:none;">
+      <div class="card-accent-bar"></div>
+      <div class="card-body">
+        <div class="card-icon">🔄</div>
+        <span class="card-number">04</span>
+        <h3 class="card-title">Ciclo de Reflexión<br><span class="slash">| Detenerse a Evaluar y Planificar</span></h3>
+        <div class="card-toggle" style="color:var(--accent)">
+          Ver guía completa
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </div>
+    </a>
+
+    <!-- CARD 5 -->
+    <a class="card card-link" href="peticiones-efectivas.html" style="text-decoration:none;">
+      <div class="card-accent-bar"></div>
+      <div class="card-body">
+        <div class="card-icon">🤝</div>
+        <span class="card-number">05</span>
+        <h3 class="card-title">Peticiones <span class="slash">/</span> Solicitudes efectivas</h3>
+        <div class="card-toggle" style="color:var(--accent)">
+          Ver guía completa
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </div>
+    </a>
+
+    <!-- CARD 6 -->
+    <a class="card card-link" href="ciclo-coordinacion.html" style="text-decoration:none;">
+      <div class="card-accent-bar"></div>
+      <div class="card-body">
+        <div class="card-icon">⚙️</div>
+        <span class="card-number">06</span>
+        <h3 class="card-title">Ciclo de Coordinación de Acciones</h3>
+        <div class="card-toggle" style="color:var(--accent)">
+          Ver guía completa
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- BITÁCORA -->
+  <div class="section-header" style="margin-top: 16px;">
+    <h2>El camino recorrido</h2>
+  </div>
+
+  <div class="bitacora-section">
+    <div class="bitacora-table-wrap">
+      <table class="bitacora-table">
+        <thead>
+          <tr>
+            <th style="width:130px">Sesión</th>
+            <th style="width:200px">Fecha</th>
+            <th>Tema principal</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><div class="session-cell"><span class="session-badge">1</span><span class="session-label">Sesión 1</span></div></td>
+            <td><span class="date-chip">15 de octubre de 2025</span></td>
+            <td class="topic-text">Inicio del programa y <strong>alineación inicial</strong>.</td>
+          </tr>
+          <tr>
+            <td><div class="session-cell"><span class="session-badge">2</span><span class="session-label">Sesión 2</span></div></td>
+            <td><span class="date-chip">29 de octubre de 2025</span></td>
+            <td class="topic-text"><strong>Diseño Estratégico de Identidad</strong>.</td>
+          </tr>
+          <tr>
+            <td><div class="session-cell"><span class="session-badge">3</span><span class="session-label">Sesión 3</span></div></td>
+            <td><span class="date-chip">12 de noviembre de 2025</span></td>
+            <td class="topic-text">Continuación del <strong>trabajo en equipo</strong>.</td>
+          </tr>
+          <tr>
+            <td><div class="session-cell"><span class="session-badge">4</span><span class="session-label">Sesión 4</span></div></td>
+            <td><span class="date-chip">03 de diciembre de 2025</span></td>
+            <td class="topic-text">El papel de los <strong>juicios en el desempeño laboral</strong>.</td>
+          </tr>
+          <tr>
+            <td><div class="session-cell"><span class="session-badge">5</span><span class="session-label">Sesión 5</span></div></td>
+            <td><span class="date-chip">10 de diciembre de 2025</span></td>
+            <td class="topic-text"><strong>Retroalimentación</strong> sobre la acción de trabajo.</td>
+          </tr>
+          <tr>
+            <td><div class="session-cell"><span class="session-badge">6</span><span class="session-label">Sesión 6</span></div></td>
+            <td><span class="date-chip">15 de enero de 2026</span></td>
+            <td class="topic-text">Diagnóstico 2025 — <strong>Acuerdos de Comunicación</strong> y Cultura de Asertividad.</td>
+          </tr>
+          <tr>
+            <td><div class="session-cell"><span class="session-badge">7</span><span class="session-label">Sesión 7</span></div></td>
+            <td><span class="date-chip">30 de enero de 2026</span></td>
+            <td class="topic-text">El <strong>Ciclo de la Reflexión</strong>: Observador, Acción y Resultados.</td>
+          </tr>
+          <tr>
+            <td><div class="session-cell"><span class="session-badge">8</span><span class="session-label">Sesión 8</span></div></td>
+            <td><span class="date-chip">11 de febrero de 2026</span></td>
+            <td class="topic-text"><strong>Ciclo de Coordinación de Acciones</strong>: Peticiones, Ofertas y Promesas.</td>
+          </tr>
+          <tr>
+            <td><div class="session-cell"><span class="session-badge">9</span><span class="session-label">Sesión 9</span></div></td>
+            <td><span class="date-chip">04 de marzo de 2026</span></td>
+            <td class="topic-text"><strong>Solicitudes Efectivas</strong>.</td>
+          </tr>
+          <tr class="upcoming-row">
+            <td><div class="session-cell"><span class="session-badge last">10</span><span class="session-label">Sesión 10 <span class="upcoming-chip">Hoy</span></span></div></td>
+            <td><span class="date-chip">01 de abril de 2026</span></td>
+            <td class="topic-text">Revisión de herramientas y <strong>plan de sostenibilidad de los cambios</strong>.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- DIVIDER -->
+  <div class="divider"><span>✦</span></div>
+
+  <!-- PART 2: COMMITMENT -->
+  <div class="section-header">
+    <h2>Mi compromiso de continuidad</h2>
+  </div>
+
+  <div class="commitment-section">
+    <div class="commitment-box">
+
+      <div class="commitment-header">
+        <div class="commitment-icon">🌱</div>
+        <div>
+          <h2>Llevar el aprendizaje al equipo</h2>
+          <p>Tres preguntas para transformar lo que aprendiste en una práctica concreta. No se trata de hacer todo —se trata de elegir un punto de entrada real y comprometerse con él.</p>
+        </div>
+      </div>
+
+      <div class="commitment-body">
+
+        <!-- BLOQUE 1: LA CONVERSACIÓN PENDIENTE -->
+        <div class="commit-block">
+          <span class="commit-eyebrow">Bloque 1 — Diagnóstico</span>
+          <h3 class="commit-q">¿Cuál es la conversación que mi equipo necesita tener y todavía no tiene?</h3>
+          <p class="commit-lead">
+            Esta pregunta ancla todo lo que sigue. No se trata de elegir una herramienta en abstracto, sino de conectar lo aprendido con una <strong>necesidad real del equipo</strong>. El conflicto no resuelto, la coordinación que falla, el feedback que nadie da, la petición que nadie hace. Nombrar esa conversación pendiente es el primer paso para abordarla.
+          </p>
+        </div>
+
+        <!-- BLOQUE 2: LA HERRAMIENTA -->
+        <div class="commit-block">
+          <span class="commit-eyebrow">Bloque 2 — Elección</span>
+          <h3 class="commit-q">¿Qué herramienta quisieras que tú y/o tu equipo utilice o desarrolle?</h3>
+          <p class="commit-lead">Las guías del programa quedan disponibles como referencia permanente. Elige la que mejor conecta con la conversación que identificaste arriba.</p>
+
+          <div class="distincion-grid">
+
+            <a class="dist-card" href="dei-identidad.html">
+              <div class="dist-card-top">
+                <span class="dist-icon">🧭</span>
+                <span class="dist-badge num">01</span>
+              </div>
+              <div class="dist-name">Diseño Estratégico de Identidad</div>
+              <div class="dist-link">Revisar guía <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></div>
+            </a>
+
+            <a class="dist-card" href="proposicion-indagacion.html">
+              <div class="dist-card-top">
+                <span class="dist-icon">🔍</span>
+                <span class="dist-badge num">02</span>
+              </div>
+              <div class="dist-name">Proposición, Indagación y Escucha</div>
+              <div class="dist-link">Revisar guía <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></div>
+            </a>
+
+            <a class="dist-card" href="retroalimentacion-juicios.html">
+              <div class="dist-card-top">
+                <span class="dist-icon">💬</span>
+                <span class="dist-badge num">03</span>
+              </div>
+              <div class="dist-name">Retroalimentación Eficaz</div>
+              <div class="dist-link">Revisar guía <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></div>
+            </a>
+
+            <a class="dist-card" href="ciclo-reflexion.html">
+              <div class="dist-card-top">
+                <span class="dist-icon">🔄</span>
+                <span class="dist-badge num">04</span>
+              </div>
+              <div class="dist-name">Ciclo de Reflexión</div>
+              <div class="dist-link">Revisar guía <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></div>
+            </a>
+
+            <a class="dist-card" href="peticiones-efectivas.html">
+              <div class="dist-card-top">
+                <span class="dist-icon">🤝</span>
+                <span class="dist-badge num">05</span>
+              </div>
+              <div class="dist-name">Peticiones Efectivas</div>
+              <div class="dist-link">Revisar guía <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></div>
+            </a>
+
+            <a class="dist-card" href="ciclo-coordinacion.html">
+              <div class="dist-card-top">
+                <span class="dist-icon">⚙️</span>
+                <span class="dist-badge num">06</span>
+              </div>
+              <div class="dist-name">Ciclo de Coordinación de Acciones</div>
+              <div class="dist-link">Revisar guía <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></div>
+            </a>
+
+            <a class="dist-card" href="conversaciones-dificiles.html">
+              <div class="dist-card-top">
+                <span class="dist-icon">🔥</span>
+                <span class="dist-badge intg">Guía de integración</span>
+              </div>
+              <div class="dist-name">Conversaciones Difíciles</div>
+              <div class="dist-link">Revisar guía <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></div>
+            </a>
+
+          </div>
+        </div>
+
+        <!-- BLOQUE 3: ACCIÓN CONCRETA -->
+        <div class="commit-block">
+          <span class="commit-eyebrow">Bloque 3 — Compromiso</span>
+          <h3 class="commit-q">¿Qué nuevas acciones diferentes realizaré en adelante?</h3>
+          <p class="commit-lead">
+            El compromiso no es una intención general (<em>"voy a indagar más"</em>). Es una <strong>micro-práctica observable con plazo corto</strong>. La diferencia entre <em>"voy a mejorar la comunicación"</em> y <em>"en las próximas dos semanas, en cada reunión haré al menos una pregunta antes de proponer una solución"</em> es la diferencia entre un deseo y un compromiso real.
+          </p>
+
+          <div class="commit-sub-grid">
+            <div class="commit-sub-card">
+              <span class="sub-num">Pregunta 1</span>
+              <h4>¿Qué haré diferente?</h4>
+              <p>Describe la acción concreta. No una intención, sino un <strong>comportamiento observable</strong> que alguien podría notar desde afuera.</p>
+            </div>
+            <div class="commit-sub-card">
+              <span class="sub-num">Pregunta 2</span>
+              <h4>¿Con quiénes?</h4>
+              <p>Nombra las personas o el equipo con quien practicarás esto. Un compromiso sin destinatario es una declaración vacía.</p>
+            </div>
+            <div class="commit-sub-card">
+              <span class="sub-num">Pregunta 3</span>
+              <h4>¿Para cuándo el primer paso?</h4>
+              <p>Establece una <strong>fecha dentro de los próximos 15 días</strong>. Sin plazo, la intención seguirá siendo intención.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- CALLOUT DE CIERRE -->
+        <div class="commit-callout">
+          <span class="cq-mark">"</span>
+          <blockquote>El aprendizaje no termina en la comprensión. Termina en la acción sostenida que transforma la forma de trabajar juntos.</blockquote>
+          <p class="cq-sub">Este material queda disponible como <strong>recurso de consulta permanente</strong>. Las guías, los conceptos y las herramientas están aquí para ser revisados cada vez que el equipo los necesite.</p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SOSTENER EL APRENDIZAJE ── -->
+  <div class="section-header" style="margin-top: 16px;">
+    <h2>Sostener el aprendizaje</h2>
+  </div>
+
+  <div class="sostener-section">
+    <div class="sostener-grid">
+
+      <div class="sostener-card">
+        <div class="sostener-card-header">
+          <span class="sostener-card-icon">🔄</span>
+          <h4>Reflexión de equipo</h4>
+          <span>Quincenal o mensual</span>
+        </div>
+        <div class="sostener-card-body">
+          <p>Usar el <strong>ciclo de reflexión</strong> en un espacio breve (15 minutos) al cierre de una reunión que ya exista. No requiere crear nuevas instancias —solo encajar la práctica en lo que el equipo ya hace.</p>
+          <ul class="sostener-q-list">
+            <li>¿Qué acción nueva probé desde la última vez?</li>
+            <li>¿Qué resultado produjo? ¿Qué observé diferente?</li>
+            <li>¿Qué ajusto para el próximo ciclo?</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="sostener-card">
+        <div class="sostener-card-header">
+          <span class="sostener-card-icon">👥</span>
+          <h4>Observación entre pares</h4>
+          <span>Retroalimentación activa</span>
+        </div>
+        <div class="sostener-card-body">
+          <p>Invitar a los participantes del programa a <strong>observarse mutuamente</strong> en sus prácticas cotidianas y darse retroalimentación usando el protocolo de juicios fundados. Las herramientas del programa se usan para sostener las prácticas del programa.</p>
+          <ul class="sostener-q-list">
+            <li>¿Observé algo concreto que pueda nombrar?</li>
+            <li>¿Es un juicio fundado o una etiqueta?</li>
+            <li>¿Lo entrego con el propósito de que el otro crezca?</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── HACIA ADELANTE ── -->
+  <div class="section-header">
+    <h2>Hacia adelante</h2>
+  </div>
+
+  <div class="hacia-section">
+    <div class="hacia-box">
+      <p>Lo que viene después de este programa es una decisión que tomaremos juntos. Este cierre no es un final — es un <em>punto de partida</em> para mirar qué posibilidades se abren desde aquí.<br><br>
+      Las herramientas están disponibles. El equipo que las usa, las transforma en <strong>cultura</strong>.</p>
+    </div>
+  </div>
+
+  <div class="footer">Coaching Organizacional · Sesión de cierre · 2026</div>
+
+  <script>
+    function toggleCard(card) {
+      const isActive = card.classList.contains('active');
+      // Close all
+      document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+      // Toggle clicked
+      if (!isActive) card.classList.add('active');
+    }
+  </script>
+</body>
+</html>
